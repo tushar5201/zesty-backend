@@ -23,6 +23,16 @@ app.use(cors());
 
 dotenv.config();
 
+app.use(cors(
+    {
+        origin: true,
+        methods: ["POST", "GET", "DELETE", "PUT"],
+        credentials: true,
+        withCredentials: true,
+        exposedHeaders: ["Set-Cookie"]
+    }
+))
+
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

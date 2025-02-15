@@ -50,7 +50,8 @@ const restaurantSchema = new mongoose.Schema(
         // ],
         menuImg: [String],
         payment: String,
-        verified: String
+        verified: String,
+        logoImg: String
     }, { timestamps: true });
 
 restaurantSchema.pre("save", async function (next, error) {

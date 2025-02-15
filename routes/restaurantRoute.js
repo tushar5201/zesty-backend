@@ -22,12 +22,11 @@ const storage = multer.diskStorage({
 // const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.post("/register", upload.array("menuImg", 5), async (req, res) => {
+router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5}]), async (req, res) => {
     try {
-        console.log(req.files);
-        
         const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
-        const menuImg = req.files.map(file => `/images/${file.filename}`);
+        const logoImg = `/images/${req.files["logoImg"][0].filename}`
+        const menuImg = req.files['menuImg'].map(file => `/images/${file.filename}`);
         // const restroExist = await Restaurant.findOne({ restaurantName });
         // if (restroExist) {
         //     return res.status(405).json({ success: false, message: "Restaurant name already exist." });
@@ -57,7 +56,8 @@ router.post("/register", upload.array("menuImg", 5), async (req, res) => {
             //     data: fs.readFileSync(img.path),
             //     contentType: img.mimetype
             // }))
-            menuImg
+            menuImg,
+            logoImg
         });
 
         // if (req.body.menuImg) {
@@ -100,5 +100,14 @@ router.get("/get/:id", async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+router.get("/get-all-restaurants", async (req, res) => {
+    try {
+        const restaurants = await Restaurant.find();
+        res.status(200).send(restaurants);
+    } catch (error) {
+        
+    }
+})
 
 module.exports = router;
