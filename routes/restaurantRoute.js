@@ -22,11 +22,11 @@ const storage = multer.diskStorage({
 // const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5}]), async (req, res) => {
+router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5 }]), async (req, res) => {
     try {
         const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
-        const logoImg = `/images/${req.files["logoImg"][0].filename}`
-        const menuImg = req.files['menuImg'].map(file => `/images/${file.filename}`);
+        // const logoImg = `/images/${req.files["logoImg"][0].filename}`
+        // const menuImg = req.files['menuImg'].map(file => `/images/${file.filename}`);
         // const restroExist = await Restaurant.findOne({ restaurantName });
         // if (restroExist) {
         //     return res.status(405).json({ success: false, message: "Restaurant name already exist." });
@@ -52,12 +52,16 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
             veg,
             payment,
             verified,
-            // menuImg: req.files.map((img) => ({
-            //     data: fs.readFileSync(img.path),
-            //     contentType: img.mimetype
-            // }))
-            menuImg,
-            logoImg
+            logoImg: {
+                // data: req.files.logoImg[0].buffer,
+                data: fs.readFileSync(req.files.logoImg[0].path),
+                contentType: req.files.logoImg[0].mimetype
+            },
+            menuImg: req.files.menuImg.map(file => ({
+                data: fs.readFileSync(file.path),
+                contentType: file.mimetype
+            }))
+
         });
 
         // if (req.body.menuImg) {
@@ -106,8 +110,24 @@ router.get("/get-all-restaurants", async (req, res) => {
         const restaurants = await Restaurant.find();
         res.status(200).send(restaurants);
     } catch (error) {
-        
+
     }
-})
+});
+
+router.get("/get-restaurant-logo/:id", async (req, res) => {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id).select("logoImg");
+
+        if (restaurant.logoImg) {
+            return res.status(200).json(restaurant.logoImg.data);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'err'
+        })
+    }
+});
 
 module.exports = router;

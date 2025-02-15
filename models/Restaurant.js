@@ -42,16 +42,20 @@ const restaurantSchema = new mongoose.Schema(
         acno: String,
         packagingCharge: String,
         veg: String,
-        // menuImg: [
-        //     {
-        //         data: Buffer,
-        //         contentType: String
-        //     },
-        // ],
-        menuImg: [String],
+        menuImg: [
+            {
+                data: Buffer,
+                contentType: String
+            },
+        ],
+        // menuImg: [String],
         payment: String,
         verified: String,
-        logoImg: String
+        // logoImg: String
+        logoImg: {
+            data: Buffer,
+            contentType: String
+        }
     }, { timestamps: true });
 
 restaurantSchema.pre("save", async function (next, error) {
