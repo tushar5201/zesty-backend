@@ -119,7 +119,7 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
         const restaurant = await Restaurant.findById(req.params.id).select("logoImg");
 
         if (restaurant.logoImg) {
-            res.set('content-type', carousel.logoImg.name)
+            res.set('content-type', restaurant.logoImg.contentType)
             return res.status(200).json(restaurant.logoImg.data);
         }
     } catch (error) {
