@@ -28,6 +28,7 @@ app.use(cors(
     {
         origin: "https://zesty-admin.vercel.app",
         methods: ["POST", "GET", "DELETE", "PUT"],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
         withCredentials: true,
         exposedHeaders: ["Set-Cookie"]
