@@ -6,6 +6,7 @@ const restaurantRoutes = require("./routes/restaurantRoute");
 const otpRoutes = require("./routes/otpRoutes");
 const menuRoutes = require("./routes/MenuRoute");
 const paymentRoutes = require("./routes/paymentRoutes");
+const categoryRoutes = require("./routes/CateoryRoutes");
 const passport = require("passport");
 const cors = require("cors");
 const Users = require("./models/Users");
@@ -25,7 +26,7 @@ dotenv.config();
 
 app.use(cors(
     {
-        origin: true,
+        origin: "*",
         methods: ["POST", "GET", "DELETE", "PUT"],
         credentials: true,
         withCredentials: true,
@@ -68,6 +69,7 @@ app.use("/restaurant", restaurantRoutes);
 app.use("/menu", menuRoutes);
 app.use("/otp", otpRoutes);
 app.use("/payment", paymentRoutes);
+app.use("/category", categoryRoutes);
 
 const http = require("http");
 // const {Server} = require("socket.io");

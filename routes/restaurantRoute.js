@@ -120,7 +120,7 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
         console.log(restaurant);
         
         if (restaurant.logoImg) {
-            res.set('content-type', restaurant.logoImg.name);
+            res.set('contentType', restaurant.logoImg.contentType);
             return res.status(200).json(restaurant.logoImg.data);
         }
     } catch (error) {
