@@ -27,7 +27,7 @@ dotenv.config();
 
 app.use(cors(
     {
-        origin: "https://zesty-admin.vercel.app",
+        origin: "*",
         methods: ["POST", "GET", "DELETE", "PUT"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
