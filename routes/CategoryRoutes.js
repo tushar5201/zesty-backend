@@ -23,7 +23,28 @@ const upload = multer({ storage: storage });
 
 router.get("/add-category", (req, res) => {
     return res.json("hello")
-})
+});
+
+router.get("/get-all-category", async (req, res) => {
+    const category = await Category.find();
+    res.send(category);
+});
+
+router.get("/get-category-image/:id", async (req, res) => {
+    try {
+        const category = await Category.findById(req.params.id).select('image');
+        if (category.image) {
+            res.set('content-type', category.image.name)
+            return res.status(200).send(category.image.data)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(401).send({
+            success: false,
+            message: 'err'
+        })
+    }
+});
 
 router.post("/add-category", upload.single("image"), async (req, res) => {
     const { name } = req.body;
@@ -51,5 +72,23 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
         console.log(error);
     }
 });
+
+router.delete("/delete-carousel", async (req, res) => {
+    try {
+        const { id } = req.body;
+        const del = await Category.findByIdAndDelete(id);
+        res.status(200).send({
+            success: true,
+            message: 'category deleted successfully.'
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(401).send({
+            success: true,
+            message: 'err in deleting category.',
+            err
+        })
+    }
+})
 
 module.exports = router;
