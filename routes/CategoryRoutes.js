@@ -73,7 +73,7 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
     }
 });
 
-router.delete("/delete-carousel", async (req, res) => {
+router.delete("/delete-category", async (req, res) => {
     try {
         const { id } = req.body;
         const del = await Category.findByIdAndDelete(id);
