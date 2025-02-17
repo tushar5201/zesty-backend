@@ -27,7 +27,7 @@ dotenv.config();
 
 app.use(cors(
     {
-        origin: "*",
+        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001"],
         methods: ["POST", "GET", "DELETE", "PUT"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
@@ -36,13 +36,13 @@ app.use(cors(
     }
 ));
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    next();
-});
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "https://zesty-admin.vercel.app");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     next();
+// });
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
