@@ -26,7 +26,7 @@ dotenv.config();
 
 app.use(cors(
     {
-        origin: "*",
+        origin: true,
         methods: ["POST", "GET", "DELETE", "PUT"],
         credentials: true,
         withCredentials: true,
