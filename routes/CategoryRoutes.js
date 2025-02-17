@@ -46,4 +46,6 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-})
+});
+
+module.exports = router;
