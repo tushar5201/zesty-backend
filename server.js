@@ -26,7 +26,7 @@ dotenv.config();
 
 app.use(cors(
     {
-        origin: "http://localhost:3001",
+        origin: "https://zesty-admin.vercel.app",
         methods: ["POST", "GET", "DELETE", "PUT"],
         credentials: true,
         withCredentials: true,
