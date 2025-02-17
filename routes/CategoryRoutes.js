@@ -34,7 +34,7 @@ router.get("/get-category-image/:id", async (req, res) => {
     try {
         const category = await Category.findById(req.params.id).select('image');
         if (category.image) {
-            res.set('content-type', category.image.name)
+            res.set('content-type', category.image.contentType)
             return res.status(200).send(category.image.data)
         }
     } catch (error) {
