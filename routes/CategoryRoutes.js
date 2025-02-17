@@ -21,6 +21,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.get("/add-category", (req, res) => {
+    return res.json("hello")
+})
+
 router.post("/add-category", upload.single("image"), async (req, res) => {
     const { name } = req.body;
     try {
