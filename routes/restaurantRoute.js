@@ -34,7 +34,7 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
             selectedArea,
             city,
             state,
-            latitude, 
+            latitude,
             longitude,
             email,
             mobile,
@@ -99,7 +99,7 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
     try {
         const restaurant = await Restaurant.findById(req.params.id).select("logoImg");
         // console.log(restaurant);
-        
+
         if (restaurant.logoImg) {
             res.set('content-type', restaurant.logoImg.contentType)
             return res.status(200).send(restaurant.logoImg.data);
@@ -115,15 +115,30 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
 
 router.get("/get-menu-images/:id", async (req, res) => {
     try {
-        const menuItem  = await Restaurant.findById(req.params.id).select("menuImg");
+        const menuItem = await Restaurant.findById(req.params.id).select("menuImg");
         const images = menuItem.menuImg.map((img) => ({
             contentType: img.contentType,
             data: `data:${img.contentType};base64,${img.data.toString("base64")}`
         }));
         res.status(200).json({ success: true, images });
     } catch (error) {
-        nsole.error(error);
+        console.error(error);
         res.status(405).json({ success: false, message: "Internal Server Error" });
+    }
+});
+
+router.put("/update-payment-status/:id", async (req, res) => {
+    try {
+        const paymentStatus = await Restaurant.findByIdAndUpdate(req.params.id, { $set: { payment: "Success" } });
+        if (!paymentStatus) {
+            return res.status(401).json({ success: false, message: "err in updating" });
+        }
+
+        return res.status(200).json({ success: true, message: "Payment status updated", order: updatedOrder });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(405).json({ success: false, message: "Internal server error" });
     }
 })
 
