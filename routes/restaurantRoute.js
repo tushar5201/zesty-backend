@@ -121,7 +121,7 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
         
         if (restaurant.logoImg) {
             res.set('content-type', restaurant.logoImg.contentType)
-            return res.status(200).json(restaurant.logoImg.data);
+            return res.status(200).send(restaurant.logoImg.data);
         }
     } catch (error) {
         console.log(error);
