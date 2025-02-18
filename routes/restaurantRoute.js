@@ -134,7 +134,7 @@ router.put("/update-payment-status/:id", async (req, res) => {
             return res.status(401).json({ success: false, message: "err in updating" });
         }
 
-        return res.status(200).json({ success: true, message: "Payment status updated", order: updatedOrder });
+        return res.status(200).json({ success: true, message: "Payment status updated" });
 
     } catch (error) {
         console.log(error);
