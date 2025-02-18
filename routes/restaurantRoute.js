@@ -23,7 +23,7 @@ const upload = multer({ storage: storage });
 
 router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5 }]), async (req, res) => {
     try {
-        const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
+        const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, latitude, longitude, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
         const restaurant = new Restaurant({
             ownerName,
             restaurantName,
@@ -34,6 +34,8 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
             selectedArea,
             city,
             state,
+            latitude, 
+            longitude,
             email,
             mobile,
             workingDays,
@@ -46,7 +48,6 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
             payment,
             verified,
             logoImg: {
-                // data: req.files.logoImg[0].buffer,
                 data: fs.readFileSync(req.files.logoImg[0].path),
                 contentType: req.files.logoImg[0].mimetype
             },

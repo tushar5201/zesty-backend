@@ -3,24 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const restaurantSchema = new mongoose.Schema(
-    // ownerFullName: String,
-    // restaurantName: String,
-    // email: String,
-    // password: String,
-    // workingDays: [String], //monday, tuesday, ...
-    // timings: String, //9.00AM to 9.00PM
-    // phone: String,
-    // location: String,
-    // bankAC: String,
-    // totalEarnings: String,
-    // menu: [{
-    //     image: { data: Buffer, contentType: String },
-    //     name: String,
-    //     price: String,
-    //     description: String,
-    //     category: String
-    // }]
-
     {
         ownerName: String,
         restaurantName: String,
@@ -31,6 +13,8 @@ const restaurantSchema = new mongoose.Schema(
         selectedArea: String,
         city: String,
         state: String,
+        latitude: Number,
+        longitude: Number,
         email: String,
         mobile: String,
         workingDays: [
