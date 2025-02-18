@@ -17,7 +17,7 @@ const MERCHANT_STATUS_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/
 const successUrl = "http://localhost:3000/payment-success";
 const failureUrl = "https://localhost:3000/payment-failure";
 
-const redirectUrl = "http://localhost:5000/payment/status";
+const redirectUrl = "https://zesty-backend.onrender.com/payment/status";
 
 router.post("/create-order", async (req, res) => {
     const { name, mobileNumber, amount } = req.body;
