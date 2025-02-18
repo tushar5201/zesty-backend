@@ -120,7 +120,7 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
         console.log(restaurant);
         
         if (restaurant.logoImg) {
-            res.set('content-type', restaurant.logoImg.name)
+            res.set('content-type', restaurant.logoImg.contentType)
             return res.status(200).json(restaurant.logoImg.data);
         }
     } catch (error) {
@@ -131,5 +131,19 @@ router.get("/get-restaurant-logo/:id", async (req, res) => {
         })
     }
 });
+
+router.get("/get-menu-images/:id", async (req, res) => {
+    try {
+        const menuItem  = await Restaurant.findById(req.params.id).select("menuImg");
+        const images = menuItem.menuImg.map((img) => ({
+            contentType: img.contentType,
+            data: `data:${img.contentType};base64,${img.data.toString("base64")}`
+        }));
+        res.status(200).json({ success: true, images });
+    } catch (error) {
+        nsole.error(error);
+        res.status(405).json({ success: false, message: "Internal Server Error" });
+    }
+})
 
 module.exports = router;
