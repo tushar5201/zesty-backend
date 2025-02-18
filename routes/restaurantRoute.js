@@ -19,18 +19,11 @@ const storage = multer.diskStorage({
     }
 })
 
-// const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5 }]), async (req, res) => {
     try {
         const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
-        // const logoImg = `/images/${req.files["logoImg"][0].filename}`
-        // const menuImg = req.files['menuImg'].map(file => `/images/${file.filename}`);
-        // const restroExist = await Restaurant.findOne({ restaurantName });
-        // if (restroExist) {
-        //     return res.status(405).json({ success: false, message: "Restaurant name already exist." });
-        // }
         const restaurant = new Restaurant({
             ownerName,
             restaurantName,
@@ -64,19 +57,6 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
 
         });
 
-        // if (req.body.menuImg) {
-        //     console.log(req.menuImg);
-
-        // for (let i = 0; i < req.menuImg.length; i++) {
-        //     console.log("pushed");
-        //     restaurant.menuImg.push({
-        //         data: fs.readFileSync(req.files[i].path),
-        //         contentType: req.files[i].mimetype
-        //     }); 
-        // }
-        // } else {
-        //     console.log("no files");
-        // }
         await restaurant.save().then(() => {
             return res.status(201).json({ success: true, message: "Restaurant Registered", restaurant });
         });
@@ -117,7 +97,7 @@ router.get("/get-all-restaurants", async (req, res) => {
 router.get("/get-restaurant-logo/:id", async (req, res) => {
     try {
         const restaurant = await Restaurant.findById(req.params.id).select("logoImg");
-        console.log(restaurant);
+        // console.log(restaurant);
         
         if (restaurant.logoImg) {
             res.set('content-type', restaurant.logoImg.contentType)
