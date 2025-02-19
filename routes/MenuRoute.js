@@ -19,6 +19,12 @@ const upload = multer({ storage: storage });
 router.post("/add-item", upload.single("image"), async (req, res) => {
     try {
         const { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;
+        if (typeof addOnes === "string") {
+            addOnes = JSON.parse(addOnes); // Parse if it's a string
+        }
+        if (typeof variant === "string") {
+            variant = JSON.parse(variant); // Parse if it's a string
+        }        
         const menuItem = new Menu({
             name,
             price,
