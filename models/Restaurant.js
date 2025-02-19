@@ -32,14 +32,18 @@ const restaurantSchema = new mongoose.Schema(
                 contentType: String
             },
         ],
-        // menuImg: [String],
         payment: String,
         verified: String,
-        // logoImg: String
         logoImg: {
             data: Buffer,
             contentType: String
-        }
+        },
+        menu: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Menus"
+            }
+        ]
     }, { timestamps: true });
 
 restaurantSchema.pre("save", async function (next, error) {

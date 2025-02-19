@@ -3,6 +3,7 @@ const Menu = require("../models/Menu");
 const multer = require("multer");
 const fs = require('fs');
 const path = require("path");
+const Restaurant = require("../models/Restaurant");
 
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -18,13 +19,13 @@ const upload = multer({ storage: storage });
 
 router.post("/add-item", upload.single("image"), async (req, res) => {
     try {
-        const { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;
+        let { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;
         if (typeof addOnes === "string") {
             addOnes = JSON.parse(addOnes); // Parse if it's a string
         }
         if (typeof variant === "string") {
             variant = JSON.parse(variant); // Parse if it's a string
-        }        
+        }
         const menuItem = new Menu({
             name,
             price,
@@ -41,24 +42,22 @@ router.post("/add-item", upload.single("image"), async (req, res) => {
             }
         });
 
-        await menuItem.save().then(() => {
-            return res.status(200).json({ success: true, message: "Menu Item saved." });
-        }).catch((err) => {
-            console.log(err);
-            return res.status(405).json({ success: false, message: "Menu Item saving failed " + err });
-        });
+        await menuItem.save();
+        await Restaurant.findByIdAndUpdate(restaurantId, { $push: { menu: menuItem._id } });
+        return res.status(200).json({ success: true, message: "Menu Item saved." });
     } catch (error) {
         console.log(error);
     }
 });
 
-router.get("/get-details", async (req, res) => {
-    try {
-        const menus = await Menu.find().populate("restaurantId");
-        return res.status(200).json({ success: true, menus });
-    } catch (error) {
-        console.log(error);
-    }
-})
+// router.get("/get-menu/:id", async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const menus = await Menu.find({ restaurantId: id }).populate("restaurantId");
+//         return res.status(200).json({ success: true, menus });
+//     } catch (error) {
+//         console.log(error);
+//     }
+// })
 
 module.exports = router;

@@ -55,7 +55,6 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
                 data: fs.readFileSync(file.path),
                 contentType: file.mimetype
             }))
-
         });
 
         await restaurant.save().then(() => {
@@ -73,13 +72,12 @@ router.get("/get/:id", async (req, res) => {
     try {
         const restaurantId = req.params.id;
         // Fetch the first restaurant from the database (modify as needed)
-        const restaurant = await Restaurant.findById(restaurantId);
-
+        const restaurant = await Restaurant.findById(restaurantId).populate("menu");
         if (!restaurant) {
             return res.status(404).json({ message: "No restaurant found" });
         }
 
-        res.status(200).json(restaurant);
+        return res.status(200).json(restaurant);
     } catch (error) {
         console.error("Error fetching restaurant:", error);
         res.status(500).json({ message: "Internal server error" });
