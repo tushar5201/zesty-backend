@@ -50,14 +50,21 @@ router.post("/add-item", upload.single("image"), async (req, res) => {
     }
 });
 
-// router.get("/get-menu/:id", async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const menus = await Menu.find({ restaurantId: id }).populate("restaurantId");
-//         return res.status(200).json({ success: true, menus });
-//     } catch (error) {
-//         console.log(error);
-//     }
-// })
+router.get("/get-menu-image/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const menus = await Menu.findById(id).select("image");
+        if (menus.image) {
+            res.set("content-type", menus.imagecontentType);
+            return res.status(200).send(menus.image.data);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'err'
+        });
+    }
+})
 
 module.exports = router;
