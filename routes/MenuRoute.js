@@ -65,6 +65,33 @@ router.get("/get-menu-image/:id", async (req, res) => {
             message: 'err'
         });
     }
+});
+
+router.delete("/delete-menu-item", async (req, res) => {
+    try {
+        const { id } = req.body;
+        const menuItem = await Menu.findById(id);
+        const restaurantId = menuItem.restaurantId;
+
+        await Menu.findByIdAndDelete(id);
+        await Restaurant.findByIdAndUpdate(
+            restaurantId,
+            { $pull: { menu: id } },
+            { new: true }
+        )
+
+        return res.status(200).send({
+            success: true,
+            message: 'menu deleted successfully.'
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send({
+            success: true,
+            message: 'err in deleting menu.',
+            err
+        })
+    }
 })
 
 module.exports = router;
