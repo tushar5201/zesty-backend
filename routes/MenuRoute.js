@@ -16,36 +16,40 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post("/addItems", upload.single("image"), async (req, res) => {
+router.post("/add-item", upload.single("image"), async (req, res) => {
     try {
-        const { name, price, description, category, restaurantId } = req.body;
-        const menuItem = new Menu({ name, price, description, category, restaurantId });
+        const { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;
+        const menuItem = new Menu({
+            name,
+            price,
+            description,
+            category,
+            restaurantId,
+            foodType,
+            packagingCharge,
+            variant,
+            addOnes,
+            image: {
+                data: fs.readFileSync(req.file.path),
+                contentType: req.file.mimetype
+            }
+        });
 
-        if (req.file) {
-            console.log("file");
-            menuItem.image.data = fs.readFileSync(req.file.path);
-            menuItem.image.contentType = req.file.type;
-        } else {
-            console.log("no files");
-        }
-        menuItem.save().then(() => {
-            return res.status(201).json({
-                success: true,
-                menuItem
-            })
+        await menuItem.save().then(() => {
+            return res.status(200).json({ success: true, message: "Menu Item saved." });
+        }).catch((err) => {
+            console.log(err);
+            return res.status(405).json({ success: false, message: "Menu Item saving failed " + err });
         });
     } catch (error) {
         console.log(error);
     }
 });
 
-router.get("/get-image", async (req, res) => {
+router.get("/get-details", async (req, res) => {
     try {
-        const image = await Menu.findById("6773dd2d247878a94755edc7").select("image");
-        if(image.image) {
-            res.set('content-type', image.image.name);
-            return res.status(200).send(image.image.data);
-        }
+        const menus = await Menu.find().populate("restaurantId");
+        return res.status(200).json({ success: true, menus });
     } catch (error) {
         console.log(error);
     }
