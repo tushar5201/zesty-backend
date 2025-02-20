@@ -3,6 +3,7 @@ const Restaurant = require("../models/Restaurant");
 const fs = require('fs');
 const multer = require("multer");
 const path = require("path");
+const { sendToAdmin } = require("../socket");
 
 const router = express.Router();
 
@@ -58,6 +59,7 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
         });
 
         await restaurant.save().then(() => {
+            sendToAdmin(restaurant);
             return res.status(201).json({ success: true, message: "Restaurant Registered", restaurant });
         });
 
@@ -66,7 +68,14 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
     }
 });
 
-
+router.put("/update/:id", async (req, res) => {
+    try {
+        const updateRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, { verified: req.body.verified }, { new: true });
+        return res.status(200).json({ success: true, data: updateRestaurant });
+    } catch(err) {
+        return res.status(405).json({ success: false, message: "Error updating restaurant." });
+    }
+})
 
 router.get("/get/:id", async (req, res) => {
     try {

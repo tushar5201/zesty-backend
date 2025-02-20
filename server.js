@@ -15,10 +15,11 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
 const session = require("express-session");
+const socketIo = require("socket.io");
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -82,31 +83,38 @@ app.use("/payment", paymentRoutes);
 app.use("/category", categoryRoutes);
 
 const http = require("http");
-// const {Server} = require("socket.io");
+const { socketHandler } = require("./socket");
+// const { Server } = require("socket.io");
 const server = http.createServer(app);
 // const io = new Server(server);
 // const userSockets = new Map();
 
-// const io = require("socket.io")(server, {
-//     cors: {origin: "*"}
-// })
+const io = socketIo(server, {
+    cors: {
+        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000"],
+        methods: ["GET", "POST"]
+    }
+});
+
+app.set("socketio", io);
+socketHandler(io);
 
 // io.on("connection", (socket) => {
 //     console.log(`Socket connected : ${socket.id}`);
 
-//     socket.on("user-join", (data) => {
+//     socket.on("admin_join", (data) => {
 //         userSockets.set(data, socket.id);
 //         io.to(socket.id).emit("session-join", "Your Session has been started");
 //     });
 
-// socket.on("disconnect", () => {
-//     for(let [userId, sockId] of userSockets.entries()) {
-//         if (sockId == socket.id) {
-//             userSockets.delete(userId);
-//             break;
-//         }
-//     }
-// });
+//     // socket.on("disconnect", () => {
+//     //     for(let [userId, sockId] of userSockets.entries()) {
+//     //         if (sockId == socket.id) {
+//     //             userSockets.delete(userId);
+//     //             break;
+//     //         }
+//     //     }
+//     // });
 
 //     socket.on("updateStatus", (data) => {
 //         console.log("status updated: ", data);
