@@ -149,9 +149,9 @@ router.put("/update-payment-status/:id", async (req, res) => {
     }
 });
 
-router.get("/check-exist", async (req, res) => {
+router.get("/check-exist/:mobile", async (req, res) => {
     try {
-        const { mobile } = req.body;
+        const mobile = req.params.mobile;
         const exist = await Restaurant.findOne({ mobile });
         if(exist) {
             return res.status(200).json({success: true, restaurantData: exist})
