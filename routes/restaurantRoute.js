@@ -72,7 +72,7 @@ router.put("/update/:id", async (req, res) => {
     try {
         const updateRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, { verified: req.body.verified }, { new: true });
         return res.status(200).json({ success: true, data: updateRestaurant });
-    } catch(err) {
+    } catch (err) {
         return res.status(405).json({ success: false, message: "Error updating restaurant." });
     }
 })
@@ -147,6 +147,18 @@ router.put("/update-payment-status/:id", async (req, res) => {
         console.log(error);
         return res.status(405).json({ success: false, message: "Internal server error" });
     }
-})
+});
+
+router.get("/check-exist", async (req, res) => {
+    try {
+        const { mobile } = req.body;
+        const exist = await Restaurant.findOne({ mobile });
+        if(exist) {
+            return res.status(200).json({success: true, restaurantData: exist})
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 module.exports = router;
