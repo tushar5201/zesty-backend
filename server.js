@@ -28,7 +28,7 @@ dotenv.config();
 
 app.use(cors(
     {
-        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000"],
+        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
         methods: ["POST", "GET", "DELETE", "PUT"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
@@ -91,7 +91,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
     cors: {
-        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000"],
+        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
         methods: ["GET", "POST"]
     }
 });

@@ -14,8 +14,8 @@ const MERCHANT_ID = "PGTESTPAYUAT86";
 const MERCHANT_BASE_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
 const MERCHANT_STATUS_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status";
 
-const successUrl = "http://localhost:3000/payment-success";
-const failureUrl = "https://localhost:3000/payment-failure";
+const successUrl = "https://zesty-restaurant-phi.vercel.app/payment-success";
+const failureUrl = "https://zesty-restaurant-phi.vercel.app//payment-failure";
 
 const redirectUrl = "https://zesty-backend.onrender.com/payment/status";
 
