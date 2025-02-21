@@ -25,6 +25,21 @@ router.get("/get-all-martItem", async (req, res) => {
     res.send(mart);
 });
 
+router.get("/get/:id", async (req, res) => {
+    try {
+        const martItemId = req.params.id;
+        const martItem = await Menu.findById(martItemId);
+        if (!martItem) {
+            return res.status(404).json({ message: "No mart item found" });
+        }
+
+        return res.status(200).json(martItem);
+    } catch (error) {
+        console.error("Error fetching mart item:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 router.get("/get-martItem-image/:id", async (req, res) => {
     try {
         const mart = await ZestyMart.findById(req.params.id).select('image');
