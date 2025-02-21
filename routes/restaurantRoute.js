@@ -59,7 +59,6 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
         });
 
         await restaurant.save().then(() => {
-            sendToAdmin(restaurant);
             return res.status(201).json({ success: true, message: "Restaurant Registered", restaurant });
         });
 
@@ -140,7 +139,8 @@ router.put("/update-payment-status/:id", async (req, res) => {
         if (!paymentStatus) {
             return res.status(401).json({ success: false, message: "err in updating" });
         }
-
+        const restaurant = await Restaurant.findById(req.params.id);
+        sendToAdmin(restaurant);
         return res.status(200).json({ success: true, message: "Payment status updated" });
 
     } catch (error) {
