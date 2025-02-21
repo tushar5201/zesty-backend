@@ -50,6 +50,21 @@ router.post("/add-item", upload.single("image"), async (req, res) => {
     }
 });
 
+router.get("/get/:id", async (req, res) => {
+    try {
+        const menuId = req.params.id;
+        const menu = await Menu.findById(menuId);
+        if (!menu) {
+            return res.status(404).json({ message: "No menu item found" });
+        }
+
+        return res.status(200).json(menu);
+    } catch (error) {
+        console.error("Error fetching menu item:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 router.get("/get-menu-image/:id", async (req, res) => {
     try {
         const { id } = req.params;
