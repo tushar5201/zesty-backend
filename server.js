@@ -6,6 +6,7 @@ const restaurantRoutes = require("./routes/restaurantRoute");
 const otpRoutes = require("./routes/otpRoutes");
 const menuRoutes = require("./routes/MenuRoute");
 const paymentRoutes = require("./routes/paymentRoutes");
+const zestyMartRoutes = require("./routes/zestyMartRoutes");
 const categoryRoutes = require("./routes/CategoryRoutes");
 const passport = require("passport");
 const cors = require("cors");
@@ -81,6 +82,7 @@ app.use("/menu", menuRoutes);
 app.use("/otp", otpRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/category", categoryRoutes);
+app.use("/zestyMart", zestyMartRoutes);
 
 const http = require("http");
 const { socketHandler } = require("./socket");
