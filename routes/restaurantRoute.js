@@ -68,7 +68,7 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
     }
 });
 
-router.put("/update/:id", async (req, res) => {
+router.put("/update-verification/:id", async (req, res) => {
     try {
         const updateRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, { verified: req.body.verified }, { new: true });
         return res.status(200).json({ success: true, data: updateRestaurant });

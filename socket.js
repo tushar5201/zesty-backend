@@ -19,6 +19,8 @@ const socketHandler = (io) => {
 
 const sendToAdmin = (data) => {
     if (adminSocket) {
+        console.log("received by socket");
+        
         adminSocket.emit("new_restaurant", data);
     }
 }
