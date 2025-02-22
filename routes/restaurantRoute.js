@@ -161,4 +161,28 @@ router.get("/check-exist/:mobile", async (req, res) => {
     }
 });
 
+router.delete("/delete-restaurant", async (req, res) => {
+    try {
+        const { id } = req.body;
+        const del = await Restaurant.findByIdAndDelete(id);
+        if (del) {
+            return res.status(200).send({
+                success: true,
+                message: 'restaurant deleted successfully.'
+            })   
+        }
+        return res.status(405).json({
+            success: false,
+            message: "err in deleting"
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send({
+            success: true,
+            message: 'err in deleting restaurant.',
+            err
+        })
+    }
+})
+
 module.exports = router;
