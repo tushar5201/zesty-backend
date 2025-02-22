@@ -54,3 +54,5 @@ router.delete("/delete-coupon", async (req, res) => {
         })
     }
 })
+
+module.exports = router;
