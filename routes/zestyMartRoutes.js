@@ -75,7 +75,7 @@ router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
             weight,
             images: req.files.map((file) => ({
                 data: fs.readFileSync(file.path),
-                contentType: file.contentType
+                contentType: file.mimetype
             }))
         });
 
