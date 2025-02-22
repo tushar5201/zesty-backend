@@ -37,9 +37,9 @@ router.get("/get-category-image/:id", async (req, res) => {
         if (category.image) {
             const optimizedImage = await sharp(category.image.data)
             .resize(200)
-            .jpeg({quality: 70})
+            .toFormat("avif", {quality: 70})
             .toBuffer();
-            res.set('content-type', 'image/jpeg')
+            res.set('content-type', 'image/avif')
             return res.status(200).send(optimizedImage)
         }
     } catch (error) {
