@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const martSchema = new mongoose.Schema({
     name: String,
-    image: { data: Buffer, contentType: String },
+    images: [{ data: Buffer, contentType: String }],
     description: String,
     price: String,
     weight: String,

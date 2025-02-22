@@ -40,13 +40,15 @@ router.get("/get/:id", async (req, res) => {
     }
 });
 
-router.get("/get-martItem-image/:id", async (req, res) => {
+router.get("/get-martItem-images/:id", async (req, res) => {
     try {
-        const mart = await ZestyMart.findById(req.params.id).select('image');
-        if (mart.image) {
-            res.set('content-type', mart.image.contentType)
-            return res.status(200).send(mart.image.data)
-        }
+        const mart = await ZestyMart.findById(req.params.id).select('images');
+        const images = mart.images.map((img) => ({
+            contentType: img.contentType,
+            data: `data:${img.contentType};base64,${img.data.toString("base64")}`
+        }));
+
+        return res.status(200).send(images);
     } catch (error) {
         console.log(error);
         res.status(401).send({
@@ -56,7 +58,7 @@ router.get("/get-martItem-image/:id", async (req, res) => {
     }
 });
 
-router.post("/add-mart-item", upload.single("image"), async (req, res) => {
+router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
     const { name, category, description, price, weight } = req.body;
     try {
         const martItemExist = await ZestyMart.findOne({ name: name });
@@ -64,16 +66,17 @@ router.post("/add-mart-item", upload.single("image"), async (req, res) => {
             return res.status(401).json({ success: false, message: "Mart Item already exist." });
         }
 
+
         const mart = await ZestyMart({
             name,
             category,
             description,
-            price, 
+            price,
             weight,
-            image: {
-                data: fs.readFileSync(req.file.path),
-                contentType: req.file.mimetype
-            }
+            images: req.files.map((file) => ({
+                data: fs.readFileSync(file.path),
+                contentType: file.contentType
+            }))
         });
 
         await mart.save().then(() => {
@@ -95,7 +98,7 @@ router.delete("/delete-mart-item", async (req, res) => {
             return res.status(200).send({
                 success: true,
                 message: 'mart item deleted successfully.'
-            })   
+            })
         }
         return res.status(405).json({
             success: false,
