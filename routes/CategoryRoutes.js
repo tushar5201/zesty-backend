@@ -3,7 +3,6 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Category = require("../models/Category");
-const sharp = require("sharp");
 
 const router = express.Router();
 
@@ -35,12 +34,8 @@ router.get("/get-category-image/:id", async (req, res) => {
     try {
         const category = await Category.findById(req.params.id).select('image');
         if (category.image) {
-            const optimizedImage = await sharp(category.image.data)
-            .resize(200)
-            .toFormat("avif", {quality: 70})
-            .toBuffer();
-            res.set('content-type', 'image/avif')
-            return res.status(200).send(optimizedImage)
+            res.set('content-type', category.image.contentType)
+            return res.status(200).send(category.image.data)
         }
     } catch (error) {
         console.log(error);
