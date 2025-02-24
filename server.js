@@ -19,6 +19,9 @@ const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
 const session = require("express-session");
 const socketIo = require("socket.io");
+const http = require("http");
+const { socketHandler } = require("./socket");
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(express.json());
@@ -88,12 +91,7 @@ app.use("/zestyMart", zestyMartRoutes);
 app.use("/coupon", couponRoutes);
 app.use("/ad", adRoutes);
 
-const http = require("http");
-const { socketHandler } = require("./socket");
-// const { Server } = require("socket.io");
 const server = http.createServer(app);
-// const io = new Server(server);
-// const userSockets = new Map();
 
 const io = socketIo(server, {
     cors: {
@@ -105,46 +103,31 @@ const io = socketIo(server, {
 app.set("socketio", io);
 socketHandler(io);
 
-// io.on("connection", (socket) => {
-//     console.log(`Socket connected : ${socket.id}`);
+app.post("/ask-help", async (req, res) => {
+    const { email, name, query } = req.body;
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        auth: {
+            user: 'tlakadiya5@gmail.com',
+            pass: 'lvxiyorjhvwywcqp'
+        }
+    });
 
-//     socket.on("admin_join", (data) => {
-//         userSockets.set(data, socket.id);
-//         io.to(socket.id).emit("session-join", "Your Session has been started");
-//     });
+    let mailOptions = ({
+        from: 'tlakadiya5@gmail.com',
+        to: email,
+        subject: 'Query by restaurant',
+        text: '\n Name : ' + name + "\n Query : " + query
+    });
 
-//     // socket.on("disconnect", () => {
-//     //     for(let [userId, sockId] of userSockets.entries()) {
-//     //         if (sockId == socket.id) {
-//     //             userSockets.delete(userId);
-//     //             break;
-//     //         }
-//     //     }
-//     // });
-
-//     socket.on("updateStatus", (data) => {
-//         console.log("status updated: ", data);
-//         io.emit('statusUpdated', data);
-//     })
-// });
-
-app.get("/api/logout", (req, res) => {
-    const userId = req.query.userId;
-
-    if (!userId) {
-        return res.status(400).json({ success: false, message: "user id is required" });
-    }
-
-    const socketId = userSockets.get(userId);
-    if (socketId) {
-        io.to(socketId).emit("session-expired", "Your Session has been terminated");
-        return res.status(200).json({ success: true, message: "Logged out success" });
-    } else {
-        return res.status(400).json({ success: false, message: "No active session found." });
-    }
-})
-
-
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            res.status(500).send('err in sending mail.')
+        } else {
+            res.status(200).send('Mail sent');
+        }
+    });
+});
 
 server.listen(5000, () => {
     console.log("serve on http://localhost:5000");
