@@ -9,6 +9,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const zestyMartRoutes = require("./routes/zestyMartRoutes");
 const couponRoutes = require("./routes/couponRoutes");
 const categoryRoutes = require("./routes/CategoryRoutes");
+const adRoutes = require("./routes/adRoutes");
 const passport = require("passport");
 const cors = require("cors");
 const Users = require("./models/Users");
@@ -85,6 +86,7 @@ app.use("/payment", paymentRoutes);
 app.use("/category", categoryRoutes);
 app.use("/zestyMart", zestyMartRoutes);
 app.use("/coupon", couponRoutes);
+app.use("/ad", adRoutes);
 
 const http = require("http");
 const { socketHandler } = require("./socket");
