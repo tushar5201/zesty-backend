@@ -28,7 +28,7 @@ router.get("/get-all-martItem", async (req, res) => {
 router.get("/get/:id", async (req, res) => {
     try {
         const martItemId = req.params.id;
-        const martItem = await Menu.findById(martItemId);
+        const martItem = await ZestyMart.findById(martItemId);
         if (!martItem) {
             return res.status(404).json({ message: "No mart item found" });
         }
@@ -90,6 +90,52 @@ router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
     }
 });
 
+router.post("/update-mart-item", upload.array("images", 5), async (req, res) => {
+    const { id, name, category, price, description, weight, existingImages } = req.body;
+    const newImages = req.files; // Newly uploaded images
+
+    try {
+        const exist = await ZestyMart.findById(id);
+        if (!exist) {
+            return res.status(404).json({ success: false, message: "Mart item not found" });
+        }
+
+        // Parse existingImages from JSON string
+        let updatedImages = [];
+        if (existingImages) {
+            updatedImages = JSON.parse(existingImages); // Parse existing images
+        }
+
+        // Add new images to the updatedImages array
+        if (newImages && newImages.length > 0) {
+            newImages.forEach((file) => {
+                updatedImages.push({
+                    data: fs.readFileSync(file.path), // Save the file path
+                    contentType: file.mimetype,
+                });
+            });
+        }
+
+        // Update the mart item
+        const updatedItem = {
+            name: name || exist.name,
+            category: category || exist.category,
+            price: price || exist.price,
+            description: description || exist.description,
+            weight: weight || exist.weight,
+            images: updatedImages, // Update images array
+        };
+
+        await ZestyMart.findByIdAndUpdate(id, updatedItem);
+
+        return res.status(200).json({ success: true, message: "Mart item updated successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+
 router.delete("/delete-mart-item", async (req, res) => {
     try {
         const { id } = req.body;
@@ -117,7 +163,7 @@ router.delete("/delete-mart-item", async (req, res) => {
 router.get("/get-category-wise/:category", async (req, res) => {
     try {
         const category = req.params.category;
-        const data = await ZestyMart.find({ category });        
+        const data = await ZestyMart.find({ category });
         return res.status(200).send(data);
     } catch (error) {
         console.log(error);

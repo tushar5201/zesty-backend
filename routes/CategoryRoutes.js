@@ -8,14 +8,14 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const dir = './images';
+        const dir = './images/category';
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
         cb(null, dir);
     },
     filename: (req, file, cb) => {
-        cb(null, "Category" + Date.now() + path.extname(file.originalname));
+        cb(null, "Category" + path.extname(file.originalname));
     }
 });
 
@@ -46,8 +46,36 @@ router.get("/get-category-image/:id", async (req, res) => {
     }
 });
 
+// router.post("/add-category", upload.single("image"), async (req, res) => {
+//     const { name } = req.body;
+//     try {
+//         const categoryExist = await Category.findOne({ name: name });
+//         if (categoryExist) {
+//             return res.status(401).json({ success: false, message: "Category already exist." });
+//         }
+
+//         const category = await Category({
+//             name,
+//             image: {
+//                 data: fs.readFileSync(req.file.path),
+//                 contentType: req.file.mimetype
+//             }
+//         });
+
+//         await category.save().then(() => {
+//             return res.status(200).json({ success: true, message: "Category saved." });
+//         }).catch((err) => {
+//             console.log(err);
+//             return res.status(405).json({ success: false, message: "category saving failed " + err });
+//         })
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
 router.post("/add-category", upload.single("image"), async (req, res) => {
     const { name } = req.body;
+    const img = req.file;
     try {
         const categoryExist = await Category.findOne({ name: name });
         if (categoryExist) {
@@ -56,10 +84,7 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
 
         const category = await Category({
             name,
-            image: {
-                data: fs.readFileSync(req.file.path),
-                contentType: req.file.mimetype
-            }
+            image: `https://zesty-backend.onrender.com/uploads/${img.filename}`
         });
 
         await category.save().then(() => {
@@ -71,7 +96,7 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-});
+})
 
 router.delete("/delete-category", async (req, res) => {
     try {

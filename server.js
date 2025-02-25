@@ -22,6 +22,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const { socketHandler } = require("./socket");
 const nodemailer = require("nodemailer");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
@@ -31,7 +32,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 dotenv.config();
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cors(
     {
         origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
