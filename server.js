@@ -32,39 +32,24 @@ app.use(cors());
 
 dotenv.config();
 
-// app.use(cors(
-//     {
-//         origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
-//         methods: ["POST", "GET", "DELETE", "PUT"],
-//         allowedHeaders: ["Content-Type", "Authorization"],
-//         credentials: true,
-//         withCredentials: true,
-//         exposedHeaders: ["Set-Cookie"]
-//     }
-// ));
+app.use(cors(
+    {
+        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
+        methods: ["POST", "GET", "DELETE", "PUT"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+        withCredentials: true,
+        exposedHeaders: ["Set-Cookie"]
+    }
+));
 
-const allowedOrigins = [
-    "https://zesty-admin.vercel.app",
-    "http://localhost:3001",
-    "http://localhost:3000",
-    "https://zesty-restaurant-phi.vercel.app"
-];
-
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, origin);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ["POST", "GET", "DELETE", "PUT", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-    exposedHeaders: ["Set-Cookie"]
-}));
-
-app.options('*', cors()); // Allow preflight requests for all routes
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "https://zesty-admin.vercel.app");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     next();
+// });
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
