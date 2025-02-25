@@ -42,7 +42,6 @@ dotenv.config();
 //         exposedHeaders: ["Set-Cookie"]
 //     }
 // ));
-const cors = require('cors');
 
 const allowedOrigins = [
     "https://zesty-admin.vercel.app",
