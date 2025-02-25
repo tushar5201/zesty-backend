@@ -52,21 +52,19 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, origin);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-
-        return callback(null, origin);
     },
-    methods: ["POST", "GET", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "application/json"],
+    methods: ["POST", "GET", "DELETE", "PUT", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
     exposedHeaders: ["Set-Cookie"]
 }));
+
+app.options('*', cors()); // Allow preflight requests for all routes
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
