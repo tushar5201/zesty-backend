@@ -107,7 +107,15 @@ router.get("/get/:id", async (req, res) => {
     }
 })
 
-router.post("/update-category", upload.single("image"), async (req, res) => {
+router.options('/update-category', (req, res) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.send();
+});
+
+router.put("/update-category", upload.single("image"), async (req, res) => {
     try {
         let { id, name } = req.body;
         const image = req.file;
