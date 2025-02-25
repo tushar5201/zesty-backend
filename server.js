@@ -32,24 +32,41 @@ app.use(cors());
 
 dotenv.config();
 
-app.use(cors(
-    {
-        origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
-        methods: ["POST", "GET", "DELETE", "PUT"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-        withCredentials: true,
-        exposedHeaders: ["Set-Cookie"]
-    }
-));
+// app.use(cors(
+//     {
+//         origin: ["https://zesty-admin.vercel.app", "http://localhost:3001", "http://localhost:3000", "https://zesty-restaurant-phi.vercel.app"],
+//         methods: ["POST", "GET", "DELETE", "PUT"],
+//         allowedHeaders: ["Content-Type", "Authorization"],
+//         credentials: true,
+//         withCredentials: true,
+//         exposedHeaders: ["Set-Cookie"]
+//     }
+// ));
 
-// app.use((req, res, next) => {
-//     res.header("Access-Control-Allow-Origin", "https://zesty-admin.vercel.app");
-//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//     res.header("Access-Control-Allow-Credentials", "true");
-//     next();
-// });
+const allowedOrigins = [
+    "https://zesty-admin.vercel.app",
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "https://zesty-restaurant-phi.vercel.app"
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+
+        return callback(null, origin);
+    },
+    methods: ["POST", "GET", "DELETE", "PUT"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    exposedHeaders: ["Set-Cookie"]
+}));
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
