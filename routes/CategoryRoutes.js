@@ -107,7 +107,7 @@ router.get("/get/:id", async (req, res) => {
     }
 })
 
-router.put("/update-category", upload.single("image"), async (req, res) => {
+router.post("/update-category", upload.single("image"), async (req, res) => {
     try {
         let { id, name } = req.body;
         const image = req.file;
