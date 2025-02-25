@@ -81,7 +81,7 @@ router.delete("/delete-category", async (req, res) => {
             return res.status(200).send({
                 success: true,
                 message: 'category deleted successfully.'
-            })   
+            })
         }
         return res.status(405).json({
             success: false,
@@ -95,6 +95,43 @@ router.delete("/delete-category", async (req, res) => {
             err
         })
     }
+});
+
+router.get("/get/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const category = await Category.findById(id);
+        return res.status(200).send(category);
+    } catch (error) {
+        console.log(error);
+    }
 })
+
+router.put("/update-category", upload.single("image"), async (req, res) => {
+    try {
+        let { id, name } = req.body;
+        const image = req.file;
+        const exist = await Category.findById(id);
+        if (exist) {
+            if (name === "") {
+                name = exist.name;
+            }
+
+            const category = await Category.findByIdAndUpdate(id, { name });
+            if (image) {
+                category.image.data = fs.readFileSync(image.path);
+                category.image.contentType = image.mimetype;
+            } else {
+                category.image.data = exist.image.data;
+                category.image.contentType = exist.image.contentType;
+            }
+
+            await category.save();
+            return res.status(200).json({ success: true, message: "updated" });
+        }
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "not updated" });
+    }
+});
 
 module.exports = router;

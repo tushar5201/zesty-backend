@@ -117,10 +117,10 @@ router.delete("/delete-mart-item", async (req, res) => {
 router.get("/get-category-wise/:category", async (req, res) => {
     try {
         const category = req.params.category;
-        const data = await ZestyMart.find({ category });
+        const data = await ZestyMart.find({ category });        
         return res.status(200).send(data);
     } catch (error) {
-
+        console.log(error);
     }
 })
 
