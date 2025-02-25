@@ -63,7 +63,7 @@ app.use(cors({
         return callback(null, origin);
     },
     methods: ["POST", "GET", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "application/json"],
     credentials: true,
     exposedHeaders: ["Set-Cookie"]
 }));
