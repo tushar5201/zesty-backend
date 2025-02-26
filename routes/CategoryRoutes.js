@@ -145,21 +145,22 @@ router.get("/get/:id", async (req, res) => {
 router.post("/update-category", upload.single("image"), async (req, res) => {
     try {
         let { id, name } = req.body;
-        const image = req.file;
         const exist = await Category.findById(id);
         if (exist) {
             if (name === "") {
                 name = exist.name;
             }
 
-            const category = await Category.findByIdAndUpdate(id, { name });
-            if (image) {
-                category.image.data = fs.readFileSync(image.path);
-                category.image.contentType = image.mimetype;
-            } else {
-                category.image.data = exist.image.data;
-                category.image.contentType = exist.image.contentType;
-            }
+            // Configure Cloudinary
+            cloudinary.config({
+                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                api_key: process.env.CLOUDINARY_API_KEY,
+                api_secret: process.env.CLOUDINARY_API_SECRET,
+            });
+            //upload to cloudinary
+            const cloudinaryUploadResponse = await cloudinary.uploader.upload(req.file.path);
+            const imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
+            const category = await Category.findByIdAndUpdate(id, { name, image: imageUrl });
 
             await category.save();
             return res.status(200).json({ success: true, message: "updated" });

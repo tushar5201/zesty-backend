@@ -143,20 +143,27 @@ router.post("/update-mart-item", upload.array("images", 5), async (req, res) => 
             return res.status(404).json({ success: false, message: "Mart item not found" });
         }
 
-        // Parse existingImages from JSON string
         let updatedImages = [];
         if (existingImages) {
             updatedImages = JSON.parse(existingImages); // Parse existing images
         }
 
-        // Add new images to the updatedImages array
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
         if (newImages && newImages.length > 0) {
-            newImages.forEach((file) => {
-                updatedImages.push({
-                    data: fs.readFileSync(file.path), // Save the file path
-                    contentType: file.mimetype,
-                });
-            });
+            for(const file of newImages) {
+                const cloudinaryUploadResponse = await cloudinary.uploader.upload(file.path);
+                updatedImages.push(cloudinaryUploadResponse.secure_url);
+            }
+            // newImages.forEach((file) => {
+            //     updatedImages.push({
+            //         data: fs.readFileSync(file.path), // Save the file path
+            //         contentType: file.mimetype,
+            //     });
+            // });
         }
 
         // Update the mart item
