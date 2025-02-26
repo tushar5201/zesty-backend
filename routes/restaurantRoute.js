@@ -4,6 +4,7 @@ const fs = require('fs');
 const multer = require("multer");
 const path = require("path");
 const { sendToAdmin } = require("../socket");
+const cloudinary = require("cloudinary").v2;
 
 const router = express.Router();
 
@@ -22,9 +23,62 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5 }]), async (req, res) => {
+//     try {
+//         const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, latitude, longitude, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
+//         const restaurant = new Restaurant({
+//             ownerName,
+//             restaurantName,
+//             pincode,
+//             shopNumber,
+//             floor,
+//             buildingName,
+//             selectedArea,
+//             city,
+//             state,
+//             latitude,
+//             longitude,
+//             email,
+//             mobile,
+//             workingDays,
+//             pan,
+//             gstin,
+//             ifsc,
+//             acno,
+//             packagingCharge,
+//             veg,
+//             payment,
+//             verified,
+//             logoImg: {
+//                 data: fs.readFileSync(req.files.logoImg[0].path),
+//                 contentType: req.files.logoImg[0].mimetype
+//             },
+//             menuImg: req.files.menuImg.map(file => ({
+//                 data: fs.readFileSync(file.path),
+//                 contentType: file.mimetype
+//             }))
+//         });
+
+//         await restaurant.save().then(() => {
+//             return res.status(201).json({ success: true, message: "Restaurant Registered", restaurant });
+//         });
+
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
 router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5 }]), async (req, res) => {
     try {
         const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, latitude, longitude, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+        //upload to cloudinary
+        const cloudinaryUploadResponse = await cloudinary.uploader.upload(req.files.logoImg[0].path);
+        const logoUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
         const restaurant = new Restaurant({
             ownerName,
             restaurantName,
@@ -48,10 +102,7 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
             veg,
             payment,
             verified,
-            logoImg: {
-                data: fs.readFileSync(req.files.logoImg[0].path),
-                contentType: req.files.logoImg[0].mimetype
-            },
+            logoImg: logoUrl,
             menuImg: req.files.menuImg.map(file => ({
                 data: fs.readFileSync(file.path),
                 contentType: file.mimetype
@@ -80,7 +131,7 @@ router.get("/get/:id", async (req, res) => {
     try {
         const restaurantId = req.params.id;
         // Fetch the first restaurant from the database (modify as needed)
-        const restaurant = await Restaurant.findById(restaurantId).populate("menu");
+        const restaurant = await Restaurant.findById(restaurantId).populate("menu").populate("ad");
         if (!restaurant) {
             return res.status(404).json({ message: "No restaurant found" });
         }
@@ -153,8 +204,8 @@ router.get("/check-exist/:mobile", async (req, res) => {
     try {
         const mobile = req.params.mobile;
         const exist = await Restaurant.findOne({ mobile });
-        if(exist) {
-            return res.status(200).json({success: true, restaurantData: exist})
+        if (exist) {
+            return res.status(200).json({ success: true, restaurantData: exist })
         }
     } catch (error) {
         console.log(error);
@@ -169,7 +220,7 @@ router.delete("/delete-restaurant", async (req, res) => {
             return res.status(200).send({
                 success: true,
                 message: 'restaurant deleted successfully.'
-            })   
+            })
         }
         return res.status(405).json({
             success: false,

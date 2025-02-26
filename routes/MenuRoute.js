@@ -4,6 +4,7 @@ const multer = require("multer");
 const fs = require('fs');
 const path = require("path");
 const Restaurant = require("../models/Restaurant");
+const cloudinary = require("cloudinary").v2;
 
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -17,6 +18,39 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// router.post("/add-item", upload.single("image"), async (req, res) => {
+//     try {
+//         let { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;
+//         if (typeof addOnes === "string") {
+//             addOnes = JSON.parse(addOnes); // Parse if it's a string
+//         }
+//         if (typeof variant === "string") {
+//             variant = JSON.parse(variant); // Parse if it's a string
+//         }
+//         const menuItem = new Menu({
+//             name,
+//             price,
+//             description,
+//             category,
+//             restaurantId,
+//             foodType,
+//             packagingCharge,
+//             variant,
+//             addOnes,
+//             image: {
+//                 data: fs.readFileSync(req.file.path),
+//                 contentType: req.file.mimetype
+//             }
+//         });
+
+//         await menuItem.save();
+//         await Restaurant.findByIdAndUpdate(restaurantId, { $push: { menu: menuItem._id } });
+//         return res.status(200).json({ success: true, message: "Menu Item saved." });
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
 router.post("/add-item", upload.single("image"), async (req, res) => {
     try {
         let { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;
@@ -26,6 +60,16 @@ router.post("/add-item", upload.single("image"), async (req, res) => {
         if (typeof variant === "string") {
             variant = JSON.parse(variant); // Parse if it's a string
         }
+
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+        //upload to cloudinary
+        const cloudinaryUploadResponse = await cloudinary.uploader.upload(req.file.path);
+        const imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
+
         const menuItem = new Menu({
             name,
             price,
@@ -36,10 +80,7 @@ router.post("/add-item", upload.single("image"), async (req, res) => {
             packagingCharge,
             variant,
             addOnes,
-            image: {
-                data: fs.readFileSync(req.file.path),
-                contentType: req.file.mimetype
-            }
+            image: imageUrl
         });
 
         await menuItem.save();
@@ -65,22 +106,22 @@ router.get("/get/:id", async (req, res) => {
     }
 });
 
-router.get("/get-menu-image/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const menus = await Menu.findById(id).select("image");
-        if (menus.image) {
-            res.set("content-type", menus.imagecontentType);
-            return res.status(200).send(menus.image.data);
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            success: false,
-            message: 'err'
-        });
-    }
-});
+// router.get("/get-menu-image/:id", async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const menus = await Menu.findById(id).select("image");
+//         if (menus.image) {
+//             res.set("content-type", menus.imagecontentType);
+//             return res.status(200).send(menus.image.data);
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).send({
+//             success: false,
+//             message: 'err'
+//         });
+//     }
+// });
 
 router.delete("/delete-menu-item", async (req, res) => {
     try {

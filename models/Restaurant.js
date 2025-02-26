@@ -34,14 +34,17 @@ const restaurantSchema = new mongoose.Schema(
         ],
         payment: String,
         verified: String,
-        logoImg: {
-            data: Buffer,
-            contentType: String
-        },
+        logoImg: String,
         menu: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Menus"
+            }
+        ],
+        ad: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Ads"
             }
         ]
     }, { timestamps: true });
