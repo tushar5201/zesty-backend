@@ -3,6 +3,14 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Category = require("../models/Category");
+const cloudinary = require("cloudinary").v2;
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const router = express.Router();
 
@@ -82,9 +90,13 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
             return res.status(401).json({ success: false, message: "Category already exist." });
         }
 
+        //upload to cloudinary
+        const cloudinaryUploadResponse = await cloudinary.uploader.upload(img.path);
+        const imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
+
         const category = await Category({
             name,
-            image: `https://zesty-backend.onrender.com/uploads/${img.filename}`
+            image: imageUrl
         });
 
         await category.save().then(() => {
