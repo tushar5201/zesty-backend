@@ -3,6 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const ZestyMart = require("../models/ZestyMart");
+const cloudinary = require("cloudinary").v2;
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -22,7 +23,7 @@ const upload = multer({ storage: storage });
 
 router.get("/get-all-martItem", async (req, res) => {
     const mart = await ZestyMart.find();
-    res.send(mart);
+    res.json(mart);
 });
 
 router.get("/get/:id", async (req, res) => {
@@ -32,7 +33,7 @@ router.get("/get/:id", async (req, res) => {
         if (!martItem) {
             return res.status(404).json({ message: "No mart item found" });
         }
-
+        
         return res.status(200).json(martItem);
     } catch (error) {
         console.error("Error fetching mart item:", error);
@@ -58,25 +59,67 @@ router.get("/get-martItem-images/:id", async (req, res) => {
     }
 });
 
+// router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
+//     const { name, category, description, price, weight } = req.body;
+//     try {
+//         const martItemExist = await ZestyMart.findOne({ name: name });
+//         if (martItemExist) {
+//             return res.status(401).json({ success: false, message: "Mart Item already exist." });
+//         }
+
+
+//         const mart = await ZestyMart({
+//             name,
+//             category,
+//             description,
+//             price,
+//             weight,
+//             images: req.files.map((file) => ({
+//                 data: fs.readFileSync(file.path),
+//                 contentType: file.mimetype
+//             }))
+//         });
+
+//         await mart.save().then(() => {
+//             return res.status(200).json({ success: true, message: "Mart item saved." });
+//         }).catch((err) => {
+//             console.log(err);
+//             return res.status(405).json({ success: false, message: "mart item saving failed " + err });
+//         })
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
 router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
     const { name, category, description, price, weight } = req.body;
+    const files = req.files; // Array of uploaded files
     try {
         const martItemExist = await ZestyMart.findOne({ name: name });
         if (martItemExist) {
             return res.status(401).json({ success: false, message: "Mart Item already exist." });
         }
 
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+        //upload to cloudinary
 
+        const imgUrls = [];
+        for(const file of files) {
+            const cloudinaryUploadResponse = await cloudinary.uploader.upload(file.path);
+            imgUrls.push(cloudinaryUploadResponse.secure_url);
+        }
+        
         const mart = await ZestyMart({
             name,
             category,
             description,
             price,
             weight,
-            images: req.files.map((file) => ({
-                data: fs.readFileSync(file.path),
-                contentType: file.mimetype
-            }))
+            images: imgUrls
         });
 
         await mart.save().then(() => {
