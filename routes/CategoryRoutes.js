@@ -4,26 +4,18 @@ const fs = require("fs");
 const path = require("path");
 const Category = require("../models/Category");
 const cloudinary = require("cloudinary").v2;
-
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 const router = express.Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const dir = './images/category';
+        const dir = './images';
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
         cb(null, dir);
     },
     filename: (req, file, cb) => {
-        cb(null, "Category"+ Date.now() + path.extname(file.originalname));
+        cb(null, "Category" + Date.now() + path.extname(file.originalname));
     }
 });
 
@@ -90,6 +82,12 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
             return res.status(401).json({ success: false, message: "Category already exist." });
         }
 
+        // Configure Cloudinary
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
         //upload to cloudinary
         const cloudinaryUploadResponse = await cloudinary.uploader.upload(img.path);
         const imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
