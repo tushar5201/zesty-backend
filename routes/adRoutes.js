@@ -29,7 +29,10 @@ router.get("/get-all-ads", async (req, res) => {
 router.get("/get-ad/:id", async (req, res) => {
     try {
         const ad = await Ad.findOne({ restaurantId: req.params.id });
-        return res.status(200).send(ad)
+        if (ad) {
+            return res.status(200).send(ad)
+        }
+        return res.status(405).json({ success: false, message: "no ad with this restaurant" })
     } catch (error) {
         console.log(error);
         res.status(401).send({

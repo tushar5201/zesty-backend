@@ -24,7 +24,6 @@ const restaurantSchema = new mongoose.Schema(
         gstin: String,
         ifsc: String,
         acno: String,
-        packagingCharge: String,
         veg: String,
         menuImg: [
             {
