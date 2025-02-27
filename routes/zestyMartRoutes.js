@@ -92,7 +92,7 @@ router.get("/get-martItem-images/:id", async (req, res) => {
 // });
 
 router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
-    const { name, category, description, price, weight } = req.body;
+    const { name, category, description, price, weight, pack } = req.body;
     const files = req.files; // Array of uploaded files
     try {
         const martItemExist = await ZestyMart.findOne({ name: name });
@@ -119,6 +119,7 @@ router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
             description,
             price,
             weight,
+            pack,
             images: imgUrls
         });
 

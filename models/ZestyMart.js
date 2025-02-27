@@ -7,7 +7,8 @@ const martSchema = new mongoose.Schema({
     description: String,
     price: String,
     weight: String,
-    category: String
+    category: String,
+    pack: String
 });
 
 const ZestyMart = mongoose.model("ZestyMart", martSchema);
