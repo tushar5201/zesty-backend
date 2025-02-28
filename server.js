@@ -10,10 +10,11 @@ const zestyMartRoutes = require("./routes/zestyMartRoutes");
 const couponRoutes = require("./routes/couponRoutes");
 const categoryRoutes = require("./routes/CategoryRoutes");
 const adRoutes = require("./routes/adRoutes");
-const passport = require("passport");
+const orderRoutes = require("./routes/orderRoutes");
+// const passport = require("passport");
 const cors = require("cors");
-const Users = require("./models/Users");
-const LocalStrategy = require("passport-local").Strategy;
+// const Users = require("./models/Users");
+// const LocalStrategy = require("passport-local").Strategy;
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
@@ -71,11 +72,11 @@ app.use(session({
 }));
 
 app.use('/images', express.static('images'));
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(new LocalStrategy(Users.authenticate()));
-passport.serializeUser(Users.serializeUser());
-passport.deserializeUser(Users.deserializeUser());
+// app.use(passport.initialize());
+// app.use(passport.session());
+// passport.use(new LocalStrategy(Users.authenticate()));
+// passport.serializeUser(Users.serializeUser());
+// passport.deserializeUser(Users.deserializeUser());
 
 app.get("/", (req, res) => {
     return res.json("Hello")
@@ -91,6 +92,7 @@ app.use("/category", categoryRoutes);
 app.use("/zestyMart", zestyMartRoutes);
 app.use("/coupon", couponRoutes);
 app.use("/ad", adRoutes);
+app.use("/order", orderRoutes);
 
 const server = http.createServer(app);
 
