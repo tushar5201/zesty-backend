@@ -3,7 +3,7 @@ const { default: mongoose } = require("mongoose");
 const menuScheme = new mongoose.Schema({
     restaurantId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Restaurant"
+        ref: "Restaurants"
     },
     name: String,
     price: String,
