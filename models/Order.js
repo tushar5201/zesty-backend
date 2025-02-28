@@ -15,7 +15,7 @@ const orderSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Menus"
         },
-        qty: String
+        quantity: String
     }],
     totalAmount: String,
     coupon: String,

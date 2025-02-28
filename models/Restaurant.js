@@ -45,6 +45,12 @@ const restaurantSchema = new mongoose.Schema(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Ads"
             }
+        ],
+        orders: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Orders"
+            }
         ]
     }, { timestamps: true });
 

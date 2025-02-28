@@ -24,4 +24,18 @@ router.post("/register", async (req, res) => {
     }
 });
 
+router.post("/check-exist", async (req, res) => {
+    try {
+        const { mobile } = req.body;
+        const userExist = await Users.findOne({ mobile: mobile });
+        if (userExist) {
+            return res.status(200).json({ success: true, userExist });
+        } else {
+            return res.status(405).json({ success: false, message: "User not exist" })
+        }
+    } catch (error) {
+
+    }
+})
+
 module.exports = router;
