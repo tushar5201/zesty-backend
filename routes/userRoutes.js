@@ -36,6 +36,20 @@ router.post("/check-exist", async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-})
+});
+
+router.post("/update-zesty-money", async (req, res) => {
+    try {
+        const { userId, zestyMoney } = req.body;
+        const update = await Users.findByIdAndUpdate(userId, { zestyMoney });
+        if (update) {
+            return res.status(200).json({ message: "updated" });
+        } else {
+            return res.status(405).json({ message: "update failed" });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 module.exports = router;

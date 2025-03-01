@@ -70,7 +70,7 @@ const upload = multer({ storage: storage });
 
 router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name: "menuImg", maxCount: 5 }]), async (req, res) => {
     try {
-        const { ownerName, restaurantName, pincode, shopNumber, floor, buildingName, selectedArea, city, state, latitude, longitude, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
+        const { ownerName, restaurantName, cuisines, pincode, shopNumber, floor, buildingName, selectedArea, city, state, latitude, longitude, email, mobile, workingDays, pan, gstin, ifsc, acno, packagingCharge, veg, payment, verified } = req.body;
         cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
@@ -82,6 +82,7 @@ router.post("/register", upload.fields([{ name: "logoImg", maxCount: 1 }, { name
         const restaurant = new Restaurant({
             ownerName,
             restaurantName,
+            cuisines,
             pincode,
             shopNumber,
             floor,
@@ -234,6 +235,6 @@ router.delete("/delete-restaurant", async (req, res) => {
             err
         })
     }
-})
+});
 
 module.exports = router;
