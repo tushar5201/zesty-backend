@@ -51,7 +51,7 @@ router.get("/get-all-orders-for-user/:userid", async (req, res) => {
 router.get("/get-active-order-for-restaurant/:restaurantid", async (req, res) => {
     const restaurantId = req.params.restaurantid;
     try {
-        const activeOrder = await Order.find({ restaurantId: restaurantId, orderStatus: { $in: ["Active", "Preparing", "Pickedup"] } });
+        const activeOrder = await Order.find({ restaurantId: restaurantId, orderStatus: { $in: ["Pending", "Active", "Prepared"] } });
         if (activeOrder) {
             return res.status(200).json(activeOrder);
         } else {

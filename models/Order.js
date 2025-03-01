@@ -20,7 +20,10 @@ const orderSchema = new mongoose.Schema({
     totalAmount: String,
     coupon: String,
     paymentMode: String,
-    orderStatus: String
+    orderStatus: {
+        type: String,
+        default: "Pending"
+    }
 }, { timestamps: true });
 
 const Order = mongoose.model("Orders", orderSchema);
