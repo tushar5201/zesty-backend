@@ -2,19 +2,19 @@ const express = require("express");
 const Order = require("../models/Order");
 const Restaurant = require("../models/Restaurant");
 const Users = require("../models/Users");
+const { sendOrderToRestaurant, sendOrderToUser } = require("../socket");
 const router = express.Router();
 
 router.post("/add-order", async (req, res) => {
     try {
-        const { restaurantId, restaurantName, userId, order, totalAmount, coupon, paymentMode, orderStatus } = req.body;
-        const orders = new Order({ restaurantId, restaurantName, userId, order, totalAmount, coupon, paymentMode, orderStatus });
+        const { restaurantId, restaurantName, userId, order, totalAmountUser, coupon, paymentMode } = req.body;
+        const orders = new Order({ restaurantId, restaurantName, userId, order, totalAmountUser, coupon, paymentMode });
         await orders.save();
         await Restaurant.findByIdAndUpdate(restaurantId, { $push: { orders: orders._id } });
         await Users.findByIdAndUpdate(userId, { $push: { orders: orders._id } });
+
+        sendOrderToRestaurant(restaurantId, orders);
         return res.status(200).json({ succss: true, orders });
-        // await orders.save().then(() => {
-        //     return res.status(200).json({ succss: true, orders });
-        // })
     } catch (error) {
         console.log(error);
     }
@@ -44,7 +44,7 @@ router.get("/get-all-orders-for-user/:userid", async (req, res) => {
             return res.status(404).json({ message: "No past orders" });
         }
     } catch (error) {
-
+        console.log(error);
     }
 });
 
@@ -75,5 +75,20 @@ router.get("/get-all-orders-for-restaurant/:restaurantid", async (req, res) => {
 
     }
 });
+
+router.post("/update-order-status", async (req, res) => {
+    const { id, orderStatus, totalAmountRestaurant } = req.body;
+    try {
+        const order = await Order.findByIdAndUpdate(id, { orderStatus, totalAmountRestaurant });
+        if (order) {
+            sendOrderToUser(order.userId, order);
+            return res.status(200).json({ success: true, message: "update success" });
+        } else {
+            return res.status(405).json({success:false, message: "update failed"})
+        }
+    } catch (error) {
+        console.log(error);
+    }
+})
 
 module.exports = router;

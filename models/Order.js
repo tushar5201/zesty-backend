@@ -17,7 +17,11 @@ const orderSchema = new mongoose.Schema({
         },
         quantity: String
     }],
-    totalAmount: String,
+    totalAmountUser: String,
+    totalAmountRestaurant: {
+        type: String,
+        default: "0"
+    },
     coupon: String,
     paymentMode: String,
     orderStatus: {
