@@ -106,23 +106,6 @@ router.get("/get/:id", async (req, res) => {
     }
 });
 
-// router.get("/get-menu-image/:id", async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const menus = await Menu.findById(id).select("image");
-//         if (menus.image) {
-//             res.set("content-type", menus.imagecontentType);
-//             return res.status(200).send(menus.image.data);
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send({
-//             success: false,
-//             message: 'err'
-//         });
-//     }
-// });
-
 router.delete("/delete-menu-item", async (req, res) => {
     try {
         const { id } = req.body;
@@ -148,6 +131,29 @@ router.delete("/delete-menu-item", async (req, res) => {
             err
         })
     }
-})
+});
+
+router.get("/get-category-wise-restaurants/:category", async (req, res) => {
+    try {
+        const { category } = req.params;
+        const menuItems = await Menu.find({ category }).select("restaurantId");
+
+        // Fetch restaurant details for each menu item
+        const resList = await Promise.all(
+            menuItems.map(async (item) => {
+                const restaurant = await Restaurant.findById(item.restaurantId);
+                return restaurant; // Return the restaurant details
+            })
+        );
+
+        // Filter out null values (if any restaurant is not found)
+        const filteredResList = resList.filter((res) => res !== null);
+
+        return res.status(200).send(filteredResList);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Internal Server Error");
+    }
+});
 
 module.exports = router;
