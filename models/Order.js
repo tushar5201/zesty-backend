@@ -15,12 +15,15 @@ const orderSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Menus"
         },
-        qty: String
+        quantity: String
     }],
     totalAmount: String,
     coupon: String,
     paymentMode: String,
-    orderStatus: String
+    orderStatus: {
+        type: String,
+        default: "Pending"
+    }
 }, { timestamps: true });
 
 const Order = mongoose.model("Orders", orderSchema);

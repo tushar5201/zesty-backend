@@ -1,14 +1,20 @@
 const express = require("express");
 const Order = require("../models/Order");
+const Restaurant = require("../models/Restaurant");
+const Users = require("../models/Users");
 const router = express.Router();
 
 router.post("/add-order", async (req, res) => {
     try {
         const { restaurantId, restaurantName, userId, order, totalAmount, coupon, paymentMode, orderStatus } = req.body;
         const orders = new Order({ restaurantId, restaurantName, userId, order, totalAmount, coupon, paymentMode, orderStatus });
-        await orders.save().then(() => {
-            return res.status(200).json({ succss: true, orders });
-        })
+        await orders.save();
+        await Restaurant.findByIdAndUpdate(restaurantId, { $push: { orders: orders._id } });
+        await Users.findByIdAndUpdate(userId, { $push: { orders: orders._id } });
+        return res.status(200).json({ succss: true, orders });
+        // await orders.save().then(() => {
+        //     return res.status(200).json({ succss: true, orders });
+        // })
     } catch (error) {
         console.log(error);
     }
@@ -45,7 +51,7 @@ router.get("/get-all-orders-for-user/:userid", async (req, res) => {
 router.get("/get-active-order-for-restaurant/:restaurantid", async (req, res) => {
     const restaurantId = req.params.restaurantid;
     try {
-        const activeOrder = await Order.find({ restaurantId: restaurantId, orderStatus: { $in: ["Active", "Preparing", "Pickedup"] } });
+        const activeOrder = await Order.find({ restaurantId: restaurantId, orderStatus: { $in: ["Pending", "Active", "Prepared"] } });
         if (activeOrder) {
             return res.status(200).json(activeOrder);
         } else {
