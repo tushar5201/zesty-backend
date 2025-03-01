@@ -11,7 +11,7 @@ const socketHandler = (io) => {
         });
 
         socket.on("user_join", (userId) => {
-            userSocket[userId] = socket;
+            userSockets[userId] = socket;
             console.log(`User ${userId}  is connected: `, socket.id);
         });
 
