@@ -79,7 +79,7 @@ router.get("/get-all-orders-for-restaurant/:restaurantid", async (req, res) => {
 router.post("/update-order-status", async (req, res) => {
     const { id, orderStatus, totalAmountRestaurant } = req.body;
     try {
-        const order = await Order.findByIdAndUpdate(id, { orderStatus, totalAmountRestaurant }).save();
+        const order = await Order.findByIdAndUpdate(id, { orderStatus, totalAmountRestaurant });
         if (order) {
             sendOrderToUser(order.userId, order);
             return res.status(200).json({ success: true, message: "update success" });
