@@ -34,7 +34,7 @@ const socketHandler = (io) => {
             }
 
             for (const [restaurantId, restaurantSocket] of Object.entries(restaurantSockets)) {
-                if(restaurantSocket === socket) {
+                if (restaurantSocket === socket) {
                     delete restaurantSockets[restaurantId];
                     console.log(`Restaurant ${restaurantId} disconnected`);
                 }
@@ -57,9 +57,11 @@ const sendOrderToRestaurant = (restaurantId, data) => {
 
 const sendOrderToUser = (userId, data) => {
     if (userSockets[userId]) {
-        console.log(data);
+        console.log("User socket object:", userSockets[userId].id);
         userSockets[userId].emit("order", data);
+    } else {
+        console.log(`No active socket for User ${userId}`);
     }
-}
+};
 
 module.exports = { socketHandler, sendToAdmin, sendOrderToRestaurant, sendOrderToUser };

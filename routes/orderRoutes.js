@@ -80,8 +80,9 @@ router.post("/update-order-status", async (req, res) => {
     const { id, orderStatus, totalAmountRestaurant } = req.body;
     try {
         const order = await Order.findByIdAndUpdate(id, { orderStatus, totalAmountRestaurant });
-        if (order) {
-            sendOrderToUser(order.userId, order);
+        if (order) {   
+            const updatedOrder = await Order.findById(id);         
+            sendOrderToUser(order.userId, updatedOrder);
             return res.status(200).json({ success: true, message: "update success" });
         } else {
             return res.status(405).json({success:false, message: "update failed"})
