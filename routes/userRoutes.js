@@ -2,6 +2,11 @@ const express = require("express");
 const Users = require("../models/Users");
 const router = express.Router();
 
+router.get("/get-all-users", async (req, res) => {
+    const users = await Users.find();
+    res.send(users);
+})
+
 router.get("/get/:id", async (req, res) => {
     const user = await Users.findById(req.params.id);
     res.send(user);
@@ -49,6 +54,30 @@ router.post("/update-zesty-money", async (req, res) => {
         }
     } catch (error) {
         console.log(error);
+    }
+});
+
+router.delete("/delete-user", async (req, res) => {
+    try {
+        const { id } = req.body;
+        const del = await Users.findByIdAndDelete(id);
+        if (del) {
+            return res.status(200).send({
+                success: true,
+                message: 'user deleted successfully.'
+            })
+        }
+        return res.status(405).json({
+            success: false,
+            message: "err in deleting"
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send({
+            success: true,
+            message: 'err in deleting user.',
+            err
+        })
     }
 });
 
