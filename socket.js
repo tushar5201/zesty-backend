@@ -57,6 +57,7 @@ const sendOrderToRestaurant = (restaurantId, data) => {
 
 const sendOrderToUser = (userId, data) => {
     if (userSockets[userId]) {
+        console.log(data);
         userSockets[userId].emit("order", data);
     }
 }
