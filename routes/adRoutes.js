@@ -90,4 +90,28 @@ router.post("/create-ad", upload.single("image"), async (req, res) => {
         console.log(error);
     }
 });
+
+router.post("/update-ad", upload.single("image"), async (req, res) => {
+    const { id } = req.body;
+    try {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+        //upload to cloudinary
+        const cloudinaryUploadResponse = await cloudinary.uploader.upload(req.file.path);
+        const imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
+
+        const ad = await Ad.findByIdAndUpdate(id, { image: imageUrl });
+        if (ad) {
+            return res.status(200).json({ success: true, message: "ad updated." });
+        } else {
+            return res.status(405).json({ success: false, message: "ad updating failed " });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+})
+
 module.exports = router;
