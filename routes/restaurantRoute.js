@@ -153,6 +153,26 @@ router.get("/get-all-restaurants", async (req, res) => {
     }
 });
 
+router.get("/get-order-size-wise", async (req, res) => {
+    const restaurants = await Restaurant.aggregate([
+        {
+            $lookup: {
+                from: "orders", // Match with Order collection
+                localField: "_id",
+                foreignField: "restaurantId",
+                as: "orderDetails"
+            }
+        },
+        {
+            $addFields: { totalOrders: { $size: "$orderDetails" } }
+        },
+        {
+            $sort: { totalOrders: -1 } // Sort in descending order
+        }
+    ]);
+    res.send(restaurants);
+});
+
 router.get("/get-restaurant-logo/:id", async (req, res) => {
     try {
         const restaurant = await Restaurant.findById(req.params.id).select("logoImg");

@@ -51,6 +51,11 @@ const upload = multer({ storage: storage });
 //     }
 // });
 
+router.get("/get-all-menu-items", async (req, res) => {
+    const menuItem = await Menu.find();
+    res.send(menuItem);
+})
+
 router.post("/add-item", upload.single("image"), async (req, res) => {
     try {
         let { name, price, description, category, restaurantId, foodType, packagingCharge, variant, addOnes } = req.body;

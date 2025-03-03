@@ -20,6 +20,11 @@ router.post("/add-order", async (req, res) => {
     }
 });
 
+router.get("/get-all-orders", async (req, res) => {
+    const orders = await Order.find();
+    return res.send(orders);
+})
+
 router.get("/get-active-order-for-user/:userid", async (req, res) => {
     const userId = req.params.userid;
     try {
