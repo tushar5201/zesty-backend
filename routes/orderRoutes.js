@@ -42,7 +42,7 @@ router.get("/get-active-order-for-user/:userid", async (req, res) => {
 router.get("/get-all-orders-for-user/:userid", async (req, res) => {
     const userId = req.params.userid;
     try {
-        const pastOrder = await Order.find({ userId: userId, orderStatus: "Delivered" });
+        const pastOrder = await Order.find({ userId: userId });
         if (pastOrder.length > 0) {
             return res.status(200).json(pastOrder);
         } else {
@@ -70,7 +70,7 @@ router.get("/get-active-order-for-restaurant/:restaurantid", async (req, res) =>
 router.get("/get-all-orders-for-restaurant/:restaurantid", async (req, res) => {
     const restaurantId = req.params.restaurantid;
     try {
-        const pastOrder = await Order.find({ restaurantId: restaurantId, orderStatus: { $in: ["Delivered", "Rejected"] } });
+        const pastOrder = await Order.find({ restaurantId: restaurantId });
         if (pastOrder.length > 0) {
             return res.status(200).json(pastOrder);
         } else {
