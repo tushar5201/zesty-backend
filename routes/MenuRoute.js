@@ -161,4 +161,42 @@ router.get("/get-category-wise-restaurants/:category", async (req, res) => {
     }
 });
 
+router.post("/update-item", upload.single("image"), async (req, res) => {
+    try {
+        let { id, name, description, foodType, category, price, packagingCharge } = req.body;
+        const exist = await Menu.findById(id);
+        let imageUrl;
+        if (req.file) {
+            // Configure Cloudinary
+            cloudinary.config({
+                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                api_key: process.env.CLOUDINARY_API_KEY,
+                api_secret: process.env.CLOUDINARY_API_SECRET,
+            });
+            //upload to cloudinary
+            const cloudinaryUploadResponse = await cloudinary.uploader.upload(req.file.path);
+            imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
+        }
+
+        if (exist) {
+            const updatedItem = {
+                name: name || exist.name,
+                description: description || exist.description,
+                foodType: foodType || exist.foodType,
+                category: category || exist.category,
+                price: price || exist.price,
+                packagingCharge: packagingCharge || exist.packagingCharge,
+                image: imageUrl ||exist.image
+            }
+
+            await Menu.findByIdAndUpdate(id, updatedItem);
+            return res.status(200).json({ success: true, message: "updated" });
+        } else {
+            return res.status(405).json({success: false, message: "Menu Item not Found"})
+        }
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "not updated" });
+    }
+})
+
 module.exports = router;

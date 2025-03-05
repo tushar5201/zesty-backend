@@ -257,4 +257,47 @@ router.delete("/delete-restaurant", async (req, res) => {
     }
 });
 
+router.post("/update-restaurant", upload.single("logoImg"), async (req, res) => {
+    try {
+        let { restaurantId, restaurantName, ownerName, cuisines, email, mobile, pan, gstin, ifsc, acno } = req.body;
+        const exist = await Restaurant.findById(restaurantId);
+        let imageUrl;
+        if (req.file) {
+            // Configure Cloudinary
+            cloudinary.config({
+                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                api_key: process.env.CLOUDINARY_API_KEY,
+                api_secret: process.env.CLOUDINARY_API_SECRET,
+            });
+            //upload to cloudinary
+            const cloudinaryUploadResponse = await cloudinary.uploader.upload(req.file.path);
+            imageUrl = cloudinaryUploadResponse.secure_url; // Public URL of the uploaded image
+        }
+
+        if (exist) {
+            const updatedRestaurant = {
+                restaurantName: restaurantName || exist.restaurantName,
+                ownerName: ownerName || exist.ownerName,
+                cuisines: cuisines || exist.cuisines,
+                email: email || exist.email,
+                mobile: mobile || exist.mobile,
+                pan: pan || exist.pan,
+                gstin: gstin || exist.gstin,
+                ifsc: ifsc || exist.ifsc,
+                acno: acno || exist.acno,
+                logoImg: imageUrl || exist.logoImg
+            }
+
+            await Restaurant.findByIdAndUpdate(restaurantId, updatedRestaurant);
+            return res.status(200).json({ success: true, message: "updated" });
+        } else {
+            return res.status(405).json({ success: false, message: "Restaurant not Found" })
+        }
+    } catch (error) {
+        console.log(error);
+        
+        return res.status(401).json({ success: false, message: "not updated" });
+    }
+})
+
 module.exports = router;

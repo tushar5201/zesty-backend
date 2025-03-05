@@ -11,24 +11,6 @@ const menuScheme = new mongoose.Schema({
     foodType: String,
     category: String,
     packagingCharge: String,
-    variant: {
-        small: {
-            price: String,
-            quantity: String
-        },
-        medium: {
-            price: String,
-            quantity: String
-        },
-        large: {
-            price: String,
-            quantity: String
-        }
-    },
-    addOnes: [{
-        name: String,
-        price: String
-    }],
     image: String
 });
 
