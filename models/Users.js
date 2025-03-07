@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "0"
     },
-    address: String,
+    address: [{ String }],
     latitute: String,
     longitude: String,
     orders: [{
