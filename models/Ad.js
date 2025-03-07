@@ -5,7 +5,6 @@ const adSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Restaurants"
     },
-    // image: { data: Buffer, contentType: String }
     image: String
 });
 
