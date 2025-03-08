@@ -102,7 +102,7 @@ router.post("/update-user", async (req, res) => {
         }
 
         const user = await Users.findByIdAndUpdate(id, updateQuery, { new: true });
-        
+
         return res.status(200).json({ success: true, message: "User updated successfully", user });
 
     } catch (error) {
@@ -111,5 +111,27 @@ router.post("/update-user", async (req, res) => {
     }
 });
 
+router.post("/delete-address", async (req, res) => {
+    try {
+        const { id, address } = req.body;
+        if (!id || !address) {
+            return res.status(400).json({ success: false, message: "User ID and address are required" });
+        }
+
+        const user = await Users.findByIdAndUpdate(
+            id,
+            { $pull: { address: address } },  // Removes the specific address
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: "User not found" });
+        }
+        return res.status(200).json({ success: true, message: "Address removed successfully", user });
+    } catch (error) {
+        console.log(error);
+        return res.status(405).json({ success: false, message: "err" });
+    }
+})
 
 module.exports = router;
