@@ -85,21 +85,31 @@ router.post("/update-user", async (req, res) => {
     try {
         let { name, email, address, mobile, id } = req.body;
         const userExist = await Users.findById(id);
-        if (userExist) {
-            const updatedUser = {
-                name: name || userExist.name,
-                email: email || userExist.email,
-                address: { $push: { address } } || userExist.address,
-                mobile: mobile || userExist.mobile
-            };
 
-            const user = await Users.findByIdAndUpdate(id, updatedUser);
-            return res.status(200).json({ success: true, message: "user updated successfully", user });
+        if (!userExist) {
+            return res.status(404).json({ success: false, message: "User not found" });
         }
+
+        let updateQuery = {
+            name: name || userExist.name,
+            email: email || userExist.email,
+            mobile: mobile || userExist.mobile
+        };
+
+        // If an address is provided, push it into the address array
+        if (address) {
+            await Users.findByIdAndUpdate(id, { $push: { address } }, { new: true });
+        }
+
+        const user = await Users.findByIdAndUpdate(id, updateQuery, { new: true });
+        
+        return res.status(200).json({ success: true, message: "User updated successfully", user });
+
     } catch (error) {
-        console.log(error);
-        return res.status(401).json({ success: false, message: "not updated" });
+        console.error(error);
+        return res.status(401).json({ success: false, message: "Update failed", error: error.message });
     }
-})
+});
+
 
 module.exports = router;
