@@ -89,7 +89,7 @@ router.post("/update-user", async (req, res) => {
             const updatedUser = {
                 name: name || userExist.name,
                 email: email || userExist.email,
-                address: address || userExist.address,
+                address: { $push: { address } } || userExist.address,
                 mobile: mobile || userExist.mobile
             };
 
