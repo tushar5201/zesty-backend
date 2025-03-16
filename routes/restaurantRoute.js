@@ -4,6 +4,7 @@ const fs = require('fs');
 const multer = require("multer");
 const path = require("path");
 const { sendToAdmin } = require("../socket");
+const Ad = require("../models/Ad");
 const cloudinary = require("cloudinary").v2;
 
 const router = express.Router();
@@ -237,6 +238,7 @@ router.delete("/delete-restaurant", async (req, res) => {
     try {
         const { id } = req.body;
         const del = await Restaurant.findByIdAndDelete(id);
+        await Ad.findOneAndDelete({ restaurantId: id });
         if (del) {
             return res.status(200).send({
                 success: true,
@@ -295,7 +297,7 @@ router.post("/update-restaurant", upload.single("logoImg"), async (req, res) => 
         }
     } catch (error) {
         console.log(error);
-        
+
         return res.status(401).json({ success: false, message: "not updated" });
     }
 })

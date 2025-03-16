@@ -83,7 +83,7 @@ router.delete("/delete-user", async (req, res) => {
 
 router.post("/update-user", async (req, res) => {
     try {
-        let { name, email, address, mobile, id } = req.body;
+        let { name, email, address, mobile, zestyLite, id } = req.body;
         const userExist = await Users.findById(id);
 
         if (!userExist) {
@@ -93,7 +93,8 @@ router.post("/update-user", async (req, res) => {
         let updateQuery = {
             name: name || userExist.name,
             email: email || userExist.email,
-            mobile: mobile || userExist.mobile
+            mobile: mobile || userExist.mobile,
+            zestyLite: zestyLite || userExist.zestyLite
         };
 
         // If an address is provided, push it into the address array
