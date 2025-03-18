@@ -138,28 +138,47 @@ router.delete("/delete-menu-item", async (req, res) => {
     }
 });
 
+// router.get("/get-category-wise-restaurants/:category", async (req, res) => {
+//     try {
+//         const { category } = req.params;
+//         const menuItems = await Menu.find({ category }).select("restaurantId").distinct('_id');
+
+//         // Fetch restaurant details for each menu item
+//         const resList = await Promise.all(
+//             menuItems.map(async (item) => {
+//                 const restaurant = await Restaurant.findById(item.restaurantId);
+//                 return restaurant; // Return the restaurant details
+//             })
+//         );
+
+//         // Filter out null values (if any restaurant is not found)
+//         const filteredResList = resList.filter((res) => res !== null);
+
+//         return res.status(200).send(filteredResList);
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).send("Internal Server Error");
+//     }
+// });
+
 router.get("/get-category-wise-restaurants/:category", async (req, res) => {
     try {
         const { category } = req.params;
-        const menuItems = await Menu.find({ category }).select("restaurantId");
 
-        // Fetch restaurant details for each menu item
-        const resList = await Promise.all(
-            menuItems.map(async (item) => {
-                const restaurant = await Restaurant.findById(item.restaurantId);
-                return restaurant; // Return the restaurant details
-            })
-        );
+        // Get distinct restaurant IDs from the Menu collection based on category
+        const restaurantIds = await Menu.find({ category })
+            .distinct("restaurantId"); // Correct field for distinct restaurant IDs
 
-        // Filter out null values (if any restaurant is not found)
-        const filteredResList = resList.filter((res) => res !== null);
+        // Fetch restaurant details for each distinct restaurant ID
+        const resList = await Restaurant.find({ _id: { $in: restaurantIds } });
 
-        return res.status(200).send(filteredResList);
+        return res.status(200).json(resList);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).send("Internal Server Error");
     }
 });
+
 
 router.post("/update-item", upload.single("image"), async (req, res) => {
     try {
