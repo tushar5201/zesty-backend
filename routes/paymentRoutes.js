@@ -67,13 +67,12 @@ router.post("/create-order", async (req, res) => {
     }
 });
 
-router.post("/status", async (req, res) => {
+router.all("/status", async (req, res) => {
     const merchantTransactionId = req.query.id;
     const keyIndex = 1;
     const string = `/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}` + MERCHANT_KEY;
     const sha256 = crypto.createHash("sha256").update(string).digest("hex");
     const checkSum = sha256 + "###" + keyIndex;
-
     const option = {
         method: "GET",
         url: `${MERCHANT_STATUS_URL}/${MERCHANT_ID}/${merchantTransactionId}`,
@@ -85,8 +84,8 @@ router.post("/status", async (req, res) => {
         },
     }
 
-    axios.request(option).then((response) => {
-        if (response.data.success) {
+    axios.request(option).then((response) => {        
+        if (response.data.success) {            
             return res.redirect(successUrl);
         } else {
             return res.redirect(failureUrl);
