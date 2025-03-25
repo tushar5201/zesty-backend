@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
+const Razorpay = require("razorpay");
 
 const MERCHANT_KEY = "96434309-7796-489d-8924-ab56988a6076";
 const MERCHANT_ID = "PGTESTPAYUAT86";
@@ -92,5 +93,27 @@ router.post("/status", async (req, res) => {
         }
     })
 });
+
+const razorpay = new Razorpay({
+    key_id: "rzp_test_H8QSQNL61MjoBo",
+    key_secret: "g7v5chunI7y2Ap7NYrAzdUYM"
+})
+
+router.post("/order", async (req, res) => {
+    try {
+        const { amount } = req.body;
+        const options = {
+            amount: amount,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+        };
+
+        const order = await razorpay.orders.create(options);
+        res.json(order)
+    } catch (error) {
+        console.log(error);
+        res.status(501).json({ message: "internal error" })
+    }
+})
 
 module.exports = router;
