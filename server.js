@@ -118,9 +118,9 @@ app.post("/ask-help", async (req, res) => {
 
     let mailOptions = ({
         from: 'tlakadiya5@gmail.com',
-        to: email,
+        to: "zestyy377@gmail.com",
         subject: 'Query by restaurant',
-        text: '\n Name : ' + name + "\n Query : " + query
+        text: '\n Name : ' + name + "\n Query : " + query + "\n Email : " + email
     });
 
     transporter.sendMail(mailOptions, (err, info) => {
