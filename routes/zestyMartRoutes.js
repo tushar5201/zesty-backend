@@ -26,6 +26,10 @@ const client = createClient({
 });
 client.on('error', err => console.log('Redis Client Error', err));
 client.connect();
+client.on('connect', () => console.log('Redis connecting...'));
+client.on('ready', () => console.log('Redis connected and ready'));
+client.on('end', () => console.log('Redis connection closed'));
+client.on('error', (err) => console.error('Redis error:', err));
 
 function generateKey(req) {
     const baseUrl = req.path.replace(/^\/+|\/+$/g, "").replace(/\//g, ":");
@@ -36,6 +40,16 @@ function generateKey(req) {
         .join("&");
     return sortedParams ? `${baseUrl}:${sortedParams}` : baseUrl;
 }
+
+router.get("/test-redis", async (req, res) => {
+    try {
+        await client.set("testKey", "Redis Working!");
+        const value = await client.get("testKey");
+        res.json({ success: true, value });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 router.get("/get-all-martItem", async (req, res) => {
     //redis key generation
