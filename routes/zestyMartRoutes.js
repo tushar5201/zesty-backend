@@ -52,22 +52,28 @@ router.get("/test-redis", async (req, res) => {
 });
 
 router.get("/get-all-martItem", async (req, res) => {
-    //redis key generation
     const key = generateKey(req);
-    //redis checked for existing key / data
+    
+    console.time("Redis Lookup");  // Start timer
     const cachedMartItems = await client.get(key);
+    console.timeEnd("Redis Lookup"); // End timer
+
     if (cachedMartItems) {
-        res.json(JSON.parse(cachedMartItems));
-        return;
+        console.log("✅ Cache HIT for key:", key);
+        return res.json(JSON.parse(cachedMartItems));
     }
 
+    console.log("❌ Cache MISS. Fetching from MongoDB...");
+    console.time("MongoDB Lookup");
     const mart = await ZestyMart.find();
+    console.timeEnd("MongoDB Lookup");
 
-    //set data to key
-    await client.set(key, JSON.stringify(mart));
-    // await client.expire(key, 30);
+    console.log("📝 Storing data in Redis...");
+    await client.set(key, JSON.stringify(mart), { EX: 60 }); // Expire in 60 sec
+
     res.json(mart);
 });
+
 
 router.get("/get/:id", async (req, res) => {
     try {
