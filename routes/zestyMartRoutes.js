@@ -21,7 +21,9 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-const client = createClient();
+const client = createClient({
+    url: process.env.REDIS_URL || "redis://127.0.0.1:6379"
+});
 client.on('error', err => console.log('Redis Client Error', err));
 client.connect();
 
