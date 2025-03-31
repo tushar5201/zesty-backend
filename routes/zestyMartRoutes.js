@@ -5,6 +5,7 @@ const path = require("path");
 const ZestyMart = require("../models/ZestyMart");
 const cloudinary = require("cloudinary").v2;
 const router = express.Router();
+const { createClient } = require("redis");
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -20,20 +21,58 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+const client = createClient();
+client.on('error', err => console.log('Redis Client Error', err));
+client.connect();
+
+function generateKey(req) {
+    const baseUrl = req.path.replace(/^\/+|\/+$/g, "").replace(/\//g, ":");
+    const params = req.query;
+    const sortedParams = Object.keys(params)
+        .sort()
+        .map((key) => `${key}=${params[key]}`)
+        .join("&");
+    return sortedParams ? `${baseUrl}:${sortedParams}` : baseUrl;
+}
 
 router.get("/get-all-martItem", async (req, res) => {
+    //redis key generation
+    const key = generateKey(req);
+    //redis checked for existing key / data
+    const cachedMartItems = await client.get(key);
+    if (cachedMartItems) {
+        res.json(JSON.parse(cachedMartItems));
+        return;
+    }
+
     const mart = await ZestyMart.find();
+
+    //set data to key
+    await client.set(key, JSON.stringify(mart));
+    // await client.expire(key, 30);
     res.json(mart);
 });
 
 router.get("/get/:id", async (req, res) => {
     try {
+
+        //redis key generation
+        const key = generateKey(req);
+        //redis checked for existing key / data
+        const cachedMartItems = await client.get(key);
+        if (cachedMartItems) {
+            res.json(JSON.parse(cachedMartItems));
+            return;
+        }
+
         const martItemId = req.params.id;
         const martItem = await ZestyMart.findById(martItemId);
+        //set data to key
+        await client.set(key, JSON.stringify(martItem));
         if (!martItem) {
             return res.status(404).json({ message: "No mart item found" });
         }
-        
+
         return res.status(200).json(martItem);
     } catch (error) {
         console.error("Error fetching mart item:", error);
@@ -108,11 +147,11 @@ router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
         //upload to cloudinary
 
         const imgUrls = [];
-        for(const file of files) {
+        for (const file of files) {
             const cloudinaryUploadResponse = await cloudinary.uploader.upload(file.path);
             imgUrls.push(cloudinaryUploadResponse.secure_url);
         }
-        
+
         const mart = await ZestyMart({
             name,
             category,
@@ -155,7 +194,7 @@ router.post("/update-mart-item", upload.array("images", 5), async (req, res) => 
             api_secret: process.env.CLOUDINARY_API_SECRET,
         });
         if (newImages && newImages.length > 0) {
-            for(const file of newImages) {
+            for (const file of newImages) {
                 const cloudinaryUploadResponse = await cloudinary.uploader.upload(file.path);
                 updatedImages.push(cloudinaryUploadResponse.secure_url);
             }
