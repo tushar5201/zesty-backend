@@ -24,7 +24,7 @@ const upload = multer({ storage: storage });
 const client = createClient({
     url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
     socket: {
-        tls: true, // Enable SSL/TLS
+        tls: false, // Enable SSL/TLS
         rejectUnauthorized: false // Avoid self-signed certificate issues
     }
 });
