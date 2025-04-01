@@ -22,7 +22,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const client = createClient({
-    url: process.env.REDIS_URL || "redis://127.0.0.1:6379"
+    url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+    socket: {
+        tls: true, // Enable SSL/TLS
+        rejectUnauthorized: false // Avoid self-signed certificate issues
+    }
 });
 client.on('error', err => console.log('Redis Client Error', err));
 client.connect();
@@ -53,7 +57,7 @@ router.get("/test-redis", async (req, res) => {
 
 router.get("/get-all-martItem", async (req, res) => {
     const key = generateKey(req);
-    
+
     const cachedMartItems = await client.get(key);
 
     if (cachedMartItems) {
