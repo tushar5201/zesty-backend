@@ -20,8 +20,12 @@ router.post("/add-order", async (req, res) => {
     }
 });
 
-router.get("/get-all-orders", async (req, res) => {
-    const orders = await Order.find();
+router.get("/get-all-orders/:page", async (req, res) => {
+    const { page } = req.params;
+    const orders = await Order.find()
+        .sort({ createdAt: "descending" })
+        .limit(10)
+        .skip(page * 10)
     return res.send(orders);
 })
 
