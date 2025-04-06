@@ -22,11 +22,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const client = createClient({
-    url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
-    socket: {
-        tls: false, // Enable SSL/TLS
-        rejectUnauthorized: false // Avoid self-signed certificate issues
-    }
+    url: "redis://default:EM3xF0HbCTkCwi67EUtBvbahyqXtszke@redis-13992.c1.us-west-2-2.ec2.redns.redis-cloud.com:13992" || "redis://127.0.0.1:6379",
 });
 client.on('error', err => console.log('Redis Client Error', err));
 client.connect();
@@ -65,7 +61,7 @@ router.get("/get-all-martItem", async (req, res) => {
     }
 
     const mart = await ZestyMart.find();
-    await client.set(key, JSON.stringify(mart), { EX: 300 }); // 5 minutes
+    await client.set(key, JSON.stringify(mart), { EX: 86400 }); // 24 hrs
     res.json(mart);
 });
 
@@ -85,7 +81,7 @@ router.get("/get/:id", async (req, res) => {
         const martItemId = req.params.id;
         const martItem = await ZestyMart.findById(martItemId);
         //set data to key
-        await client.set(key, JSON.stringify(martItem));
+        await client.set(key, JSON.stringify(martItem), {EX: 86400});
         if (!martItem) {
             return res.status(404).json({ message: "No mart item found" });
         }
@@ -179,6 +175,10 @@ router.post("/add-mart-item", upload.array("images", 5), async (req, res) => {
             images: imgUrls
         });
 
+        const cachedMartItems = await client.get("get-all-martItem");
+        if (cachedMartItems) {
+            await client.DEL(cachedMartItems);
+        }
         await mart.save().then(() => {
             return res.status(200).json({ success: true, message: "Mart item saved." });
         }).catch((err) => {
@@ -232,7 +232,7 @@ router.post("/update-mart-item", upload.array("images", 5), async (req, res) => 
             weight: weight || exist.weight,
             images: updatedImages, // Update images array
         };
-
+        await client.set(`get:${id}`, JSON.stringify(updatedItem), {EX: 86400})
         await ZestyMart.findByIdAndUpdate(id, updatedItem);
 
         return res.status(200).json({ success: true, message: "Mart item updated successfully" });
@@ -253,6 +253,7 @@ router.delete("/delete-mart-item", async (req, res) => {
                 message: 'mart item deleted successfully.'
             })
         }
+        await client.DEL(`get:${id}`)
         return res.status(405).json({
             success: false,
             message: "err in deleting"
