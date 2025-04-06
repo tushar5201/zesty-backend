@@ -23,7 +23,7 @@ router.post("/add-order", async (req, res) => {
 router.get("/get-all-orders/:page", async (req, res) => {
     const { page } = req.params;
     let orders;
-    if (page === 0) {
+    if (page === "0") {
         orders = await Order.find();
     } else {
         orders = await Order.find()
