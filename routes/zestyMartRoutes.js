@@ -54,7 +54,7 @@ router.get("/test-redis", async (req, res) => {
 router.get("/get-all-martItem", async (req, res) => {
     const key = generateKey(req);
 
-    const cachedMartItems = await client.get(key);
+    const cachedMartItems = await client.get("get-all-martItem");
 
     if (cachedMartItems) {
         return res.json(JSON.parse(cachedMartItems));
